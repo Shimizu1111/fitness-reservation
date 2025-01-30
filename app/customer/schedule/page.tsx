@@ -3,7 +3,7 @@
 import { CustomerNav } from "../components/customer-nav";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
 import { useState } from "react";
 
 // 日付フォーマット用のヘルパー関数
@@ -32,9 +32,18 @@ function getWeekDates(startDate: Date = new Date()): Array<{ date: string; day: 
   return dates;
 }
 
+// レッスン時間をDateオブジェクトに変換する関数
+function getLessonDateTime(date: Date, timeStr: string): Date {
+  const [startTime] = timeStr.split(" - ");
+  const [hours, minutes] = startTime.split(":").map(Number);
+  const lessonDate = new Date(date);
+  lessonDate.setHours(hours, minutes, 0, 0);
+  return lessonDate;
+}
+
 // 仮のデータを生成する関数
 function generateWeeklyLessons(weekDates: Array<{ date: string; day: string; fullDate: Date }>) {
-  return weekDates.map(({ date, day }) => ({
+  return weekDates.map(({ date, day, fullDate }) => ({
     date,
     day,
     lessons: [
@@ -44,7 +53,8 @@ function generateWeeklyLessons(weekDates: Array<{ date: string; day: string; ful
         trainer: "SATOKO",
         type: "セミパーソナル",
         capacity: "0/2",
-        imageUrl: "/trainers/satoko.jpg"
+        imageUrl: "/trainers/satoko.jpg",
+        datetime: getLessonDateTime(fullDate, "10:00 - 10:45")
       },
       {
         id: Math.random(),
@@ -52,7 +62,8 @@ function generateWeeklyLessons(weekDates: Array<{ date: string; day: string; ful
         trainer: day === "水" ? "KEN" : "MAYU",
         type: "セミパーソナル",
         capacity: "0/2",
-        imageUrl: day === "水" ? "/trainers/ken.jpg" : "/trainers/mayu.jpg"
+        imageUrl: day === "水" ? "/trainers/ken.jpg" : "/trainers/mayu.jpg",
+        datetime: getLessonDateTime(fullDate, "11:00 - 11:45")
       }
     ]
   }));
@@ -72,6 +83,12 @@ export default function SchedulePage() {
 
   // 表示用の期間文字列を生成
   const displayPeriod = `${formatDate(weekDates[0].fullDate)} - ${formatDate(weekDates[6].fullDate)}`;
+
+  // レッスンが予約可能かどうかを判定する関数
+  const isLessonAvailable = (lessonDateTime: Date): boolean => {
+    const now = new Date();
+    return lessonDateTime > now;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -103,25 +120,35 @@ export default function SchedulePage() {
 
               {/* レッスン一覧 */}
               <div className="space-y-2">
-                {day.lessons.map((lesson) => (
-                  <Card key={lesson.id} className="p-4 hover:shadow-md transition-shadow">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100">
-                        {/* トレーナーの画像（実際の画像に置き換える必要あり） */}
-                        <div className="w-full h-full bg-gray-200"></div>
+                {day.lessons.map((lesson) => {
+                  const available = isLessonAvailable(lesson.datetime);
+                  return (
+                    <Card key={lesson.id} className={`p-4 hover:shadow-md transition-shadow ${!available ? 'opacity-50' : ''}`}>
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100">
+                          {/* トレーナーの画像（実際の画像に置き換える必要あり） */}
+                          <div className="w-full h-full bg-gray-200"></div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-medium text-gray-800">{lesson.trainer}</div>
+                          <div className="text-sm text-gray-500">{lesson.time}</div>
+                          <div className="text-xs text-gray-400">{lesson.type}</div>
+                          <div className="text-xs text-gray-400">{lesson.capacity}</div>
+                        </div>
+                        {available ? (
+                          <Button className="w-full bg-sky-500 hover:bg-sky-600 text-sm">
+                            予約する
+                          </Button>
+                        ) : (
+                          <Button className="w-full bg-gray-300 cursor-not-allowed text-sm" disabled>
+                            <Lock className="h-4 w-4 mr-1" />
+                            予約終了
+                          </Button>
+                        )}
                       </div>
-                      <div className="text-center">
-                        <div className="font-medium text-gray-800">{lesson.trainer}</div>
-                        <div className="text-sm text-gray-500">{lesson.time}</div>
-                        <div className="text-xs text-gray-400">{lesson.type}</div>
-                        <div className="text-xs text-gray-400">{lesson.capacity}</div>
-                      </div>
-                      <Button className="w-full bg-sky-500 hover:bg-sky-600 text-sm">
-                        予約する
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  );
+                })}
               </div>
             </div>
           ))}
