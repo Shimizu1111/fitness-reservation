@@ -4,158 +4,75 @@ import { CustomerNav } from "../components/customer-nav";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
-// 仮のデータ（後でAPIから取得するように変更）
-const weeklyLessons = [
-  {
-    date: "12/19",
-    day: "火",
-    lessons: [
-      {
-        id: 1,
-        time: "10:00 - 10:45",
-        trainer: "SATOKO",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/satoko.jpg"
-      },
-      {
-        id: 2,
-        time: "11:00 - 11:45",
-        trainer: "MAYU",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/mayu.jpg"
-      }
-    ]
-  },
-  {
-    date: "12/20",
-    day: "水",
-    lessons: [
-      {
-        id: 3,
-        time: "11:00 - 11:45",
-        trainer: "KEN",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/ken.jpg"
-      }
-    ]
-  },
-  {
-    date: "12/21",
-    day: "木",
-    lessons: [
-      {
-        id: 4,
-        time: "10:00 - 10:45",
-        trainer: "KEN",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/ken.jpg"
-      },
-      {
-        id: 5,
-        time: "11:00 - 11:45",
-        trainer: "KEN",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/ken.jpg"
-      }
-    ]
-  },
-  {
-    date: "12/22",
-    day: "金",
-    lessons: [
-      {
-        id: 6,
-        time: "10:00 - 10:45",
-        trainer: "SATOKO",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/satoko.jpg"
-      },
-      {
-        id: 7,
-        time: "11:00 - 11:45",
-        trainer: "SATOKO",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/satoko.jpg"
-      }
-    ]
-  },
-  {
-    date: "12/23",
-    day: "土",
-    lessons: [
-      {
-        id: 8,
-        time: "10:00 - 10:45",
-        trainer: "SATOKO",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/satoko.jpg"
-      },
-      {
-        id: 9,
-        time: "11:00 - 11:45",
-        trainer: "MAYU",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/mayu.jpg"
-      }
-    ]
-  },
-  {
-    date: "12/24",
-    day: "日",
-    lessons: [
-      {
-        id: 10,
-        time: "10:00 - 10:45",
-        trainer: "KEN",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/ken.jpg"
-      },
-      {
-        id: 11,
-        time: "11:00 - 11:45",
-        trainer: "KEN",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/ken.jpg"
-      }
-    ]
-  },
-  {
-    date: "12/25",
-    day: "月",
-    lessons: [
-      {
-        id: 12,
-        time: "10:00 - 10:45",
-        trainer: "SATOKO",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/satoko.jpg"
-      },
-      {
-        id: 13,
-        time: "11:00 - 11:45",
-        trainer: "SATOKO",
-        type: "セミパーソナル",
-        capacity: "0/2",
-        imageUrl: "/trainers/satoko.jpg"
-      }
-    ]
+// 日付フォーマット用のヘルパー関数
+function formatDate(date: Date): string {
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+}
+
+// 曜日の配列
+const DAYS = ["日", "月", "火", "水", "木", "金", "土"];
+
+// 1週間の日付配列を生成する関数
+function getWeekDates(startDate: Date = new Date()): Array<{ date: string; day: string; fullDate: Date }> {
+  const dates = [];
+  const current = new Date(startDate);
+  
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(current);
+    dates.push({
+      date: formatDate(date),
+      day: DAYS[date.getDay()],
+      fullDate: date
+    });
+    current.setDate(current.getDate() + 1);
   }
-];
+  
+  return dates;
+}
+
+// 仮のデータを生成する関数
+function generateWeeklyLessons(weekDates: Array<{ date: string; day: string; fullDate: Date }>) {
+  return weekDates.map(({ date, day }) => ({
+    date,
+    day,
+    lessons: [
+      {
+        id: Math.random(),
+        time: "10:00 - 10:45",
+        trainer: "SATOKO",
+        type: "セミパーソナル",
+        capacity: "0/2",
+        imageUrl: "/trainers/satoko.jpg"
+      },
+      {
+        id: Math.random(),
+        time: "11:00 - 11:45",
+        trainer: day === "水" ? "KEN" : "MAYU",
+        type: "セミパーソナル",
+        capacity: "0/2",
+        imageUrl: day === "水" ? "/trainers/ken.jpg" : "/trainers/mayu.jpg"
+      }
+    ]
+  }));
+}
 
 export default function SchedulePage() {
+  const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
+  const weekDates = getWeekDates(currentWeekStart);
+  const weeklyLessons = generateWeeklyLessons(weekDates);
+
+  // 週を移動する関数
+  const moveWeek = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentWeekStart);
+    newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
+    setCurrentWeekStart(newDate);
+  };
+
+  // 表示用の期間文字列を生成
+  const displayPeriod = `${formatDate(weekDates[0].fullDate)} - ${formatDate(weekDates[6].fullDate)}`;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <CustomerNav />
@@ -164,11 +81,11 @@ export default function SchedulePage() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">レッスン予約</h1>
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" onClick={() => moveWeek('prev')}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="text-lg font-medium">12/19 - 12/25</span>
-            <Button variant="outline" size="icon">
+            <span className="text-lg font-medium">{displayPeriod}</span>
+            <Button variant="outline" size="icon" onClick={() => moveWeek('next')}>
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
