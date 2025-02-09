@@ -2,7 +2,7 @@ import { LessonLocationType, LessonStatusType } from "../constants/lesson";
 
 export interface Lesson {
   id: number;
-  type: string;
+  lessonTypeId: number;
   trainerId: string;
   scheduledStartAt: string;
   scheduledEndAt: string;

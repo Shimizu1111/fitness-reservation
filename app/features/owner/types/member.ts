@@ -14,7 +14,7 @@ export interface Member {
   status: MemberStatusType;
   cancellationReason: string | null;
   joinDate: string | null;
-  totalLessons: number;
+  totalLessons: number | null;
   lastLesson: string | null;
 }
 

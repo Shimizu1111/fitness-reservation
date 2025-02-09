@@ -1,5 +1,4 @@
 import { ReservationStatusType } from "../constants/reservation";
-import { MemberStatusType } from "./member";
 
 export interface Reservation {
   id: number;
