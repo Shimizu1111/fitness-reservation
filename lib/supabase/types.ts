@@ -247,6 +247,7 @@ export type Database = {
           status: number
           reservation_count: number
           latest_reserved_at: string
+          join_date: string
         }[]
       }
     }
