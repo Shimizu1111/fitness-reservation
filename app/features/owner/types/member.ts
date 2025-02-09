@@ -5,17 +5,17 @@ export type MemberStatusStringType = string;
 
 export interface Member {
   id: string;
+  roleId: number;
   name: string;
+  password: string | null;
   email: string;
   phone: string | null;
   address: string | null;
+  status: MemberStatusType;
+  cancellationReason: string | null;
   joinDate: string | null;
   totalLessons: number;
   lastLesson: string | null;
-  status: MemberStatusType;
-  cancellationReason: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
 }
 
 export interface MemberFormData {

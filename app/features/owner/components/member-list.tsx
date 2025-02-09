@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getMembers, updateMemberStatus } from '../data/member';
-import type { Member, MemberFilters } from '../data/types';
+import type { Member, MemberFilters } from '../types/member';
 import { getMemberStatusString, MemberStatus } from '../constants/member';
 
 export function MemberList() {

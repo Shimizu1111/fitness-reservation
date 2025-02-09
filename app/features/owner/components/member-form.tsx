@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createMember } from '../data/member';
-import type { MemberFormData } from '../data/types';
+import type { MemberFormData } from '../types/member';
 import { generateSecurePassword } from '@/lib/utils/password';
 import { toast } from '@/hooks/use-toast';
 

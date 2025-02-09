@@ -22,3 +22,11 @@ export type MemberStatusStringType = typeof MemberStatusString[keyof typeof Memb
 export const getMemberStatusString = (status: MemberStatusType): MemberStatusStringType => {
   return mapValueToString(MemberStatusString, status) as MemberStatusStringType;
 };
+
+export const UserRole = {
+  OWNER: 1,      // オーナー
+  TRAINER: 2,    // トレーナー
+  CUSTOMER: 3,   // 顧客
+} as const;
+
+export type UserRoleType = typeof UserRole[keyof typeof UserRole];
