@@ -1,27 +1,11 @@
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/types';
 import type { Member } from './types';
+import { getMemberStatusString, MemberStatusType } from '../constants/member';
 
 type User = Database['public']['Tables']['fitness_reservation_users']['Row'];
 
 export type UserReservationSummary = Database['public']['Functions']['get_user_reservation_summary']['Returns'][number];
-
-// データベースの型からアプリケーションの型への変換関数
-// function convertToMember(user: User & { 
-//   reservation_count?: number,
-//   latest_reserved_at?: string | null 
-// }): Member {
-//   return {
-//     id: user.id,
-//     name: user.name,
-//     email: user.email,
-//     phone: user.phone || '',
-//     joinDate: user.join_date,
-//     totalLessons: user.reservation_count || 0,
-//     lastLesson: user.latest_reserved_at || null,
-//     status: user.status === 1 ? 'active' : 'inactive'
-//   };
-// }
 
 // 会員一覧を取得
 export async function getMembers() {
@@ -38,15 +22,15 @@ export async function getMembers() {
     email: user.email,
     phone: user.phone || null,
     address: null,
-    joinDate: null,
+    joinDate: user.join_date,
     totalLessons: user.reservation_count,
     lastLesson: user.latest_reserved_at || null,
-    status: user.status === 1 ? 'active' : user.status === 2 ? 'suspended' : 'cancelled',
+    status: user.status as MemberStatusType,
     cancellationReason: null,
     createdAt: null,
     updatedAt: null,
   })) || [];
-
+  
   return { data: members, error: null };
 }
 

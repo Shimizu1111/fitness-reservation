@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getMembers, updateMemberStatus } from '../data/member';
 import type { Member, MemberFilters } from '../data/types';
+import { getMemberStatusString, MemberStatus } from '../constants/member';
 
 export function MemberList() {
   const router = useRouter();
@@ -170,11 +171,11 @@ export function MemberList() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      member.status === 'active'
+                      member.status === MemberStatus.ACTIVE
                         ? 'bg-green-100 text-green-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {member.status === 'active' ? 'アクティブ' : '非アクティブ'}
+                      {getMemberStatusString(member.status)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -190,10 +191,10 @@ export function MemberList() {
                       className="text-red-600 hover:text-red-900 ml-2"
                       onClick={() => handleStatusChange(
                         member.id,
-                        member.status === 'active' ? 'inactive' : 'active'
+                        member.status === MemberStatus.ACTIVE ? 'inactive' : 'active'
                       )}
                     >
-                      {member.status === 'active' ? '利用停止' : '再開'}
+                      {member.status === MemberStatus.ACTIVE ? '利用停止' : '再開'}
                     </Button>
                   </td>
                 </tr>

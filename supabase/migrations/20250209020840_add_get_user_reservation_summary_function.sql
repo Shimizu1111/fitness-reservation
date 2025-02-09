@@ -4,10 +4,10 @@ RETURNS TABLE (
     name TEXT,
     email TEXT,
     phone TEXT,
-    status INTEGER,
-    reservation_count INTEGER,
-    latest_reserved_at TIMESTAMP,
-    join_date TIMESTAMP
+    status SMALLINT,
+    reservation_count BIGINT,
+    latest_reserved_at TIMESTAMP WITH TIME ZONE,
+    join_date TIMESTAMP WITH TIME ZONE
 )
 LANGUAGE plpgsql
 AS $$
