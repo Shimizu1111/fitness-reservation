@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { createMember } from '../data/member';
 import type { MemberFormData } from '../data/types';
 import { generateSecurePassword } from '@/lib/utils/password';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 export function MemberForm() {
   const router = useRouter();

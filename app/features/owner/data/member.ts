@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/types';
-import type { Member } from './types';
-import { getMemberStatusString, MemberStatusType } from '../constants/member';
+import type { Member, MemberStatusType } from '../types/member';
+import { getMemberStatusString } from '../constants/member';
 
 type User = Database['public']['Tables']['fitness_reservation_users']['Row'];
 
@@ -9,23 +9,23 @@ export type UserReservationSummary = Database['public']['Functions']['get_user_r
 
 // 会員一覧を取得
 export async function getMembers() {
-  const { data: users, error: userError } = await supabase.rpc('get_user_reservation_summary');
+  const { data: fetchedMembers, error: userError } = await supabase.rpc('get_user_reservation_summary');
 
   if (userError) {
     console.error('会員データの取得に失敗しました:', userError);
     return { data: null, error: userError };
   }
 
-  const members: Member[] = users?.map(user => ({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    phone: user.phone || null,
+  const members: Member[] = fetchedMembers?.map(member => ({
+    id: member.id,
+    name: member.name,
+    email: member.email,
+    phone: member.phone || null,
     address: null,
-    joinDate: user.join_date,
-    totalLessons: user.reservation_count,
-    lastLesson: user.latest_reserved_at || null,
-    status: user.status as MemberStatusType,
+    joinDate: member.join_date,
+    totalLessons: member.reservation_count,
+    lastLesson: member.latest_reserved_at || null,
+    status: member.status as MemberStatusType,
     cancellationReason: null,
     createdAt: null,
     updatedAt: null,
@@ -58,12 +58,10 @@ export async function getMemberById(id: string) {
 }
 
 // 会員のステータスを更新
-export async function updateMemberStatus(id: string, status: 'active' | 'inactive') {
-  const statusValue = status === 'active' ? 1 : 2;
-  
+export async function updateMemberStatus(id: string, status: MemberStatusType) {
   const { data, error } = await supabase
     .from('fitness_reservation_users')
-    .update({ status: statusValue })
+    .update({ status })
     .eq('id', id)
     .select()
     .single();
@@ -71,7 +69,22 @@ export async function updateMemberStatus(id: string, status: 'active' | 'inactiv
   if (error) return { data: null, error };
   if (!data) return { data: null, error: new Error('会員が見つかりません') };
 
-  return { data: convertToMember(data), error: null };
+  const member: Member = {
+    id: data.id,
+    name: data.name,
+    email: data.email,
+    phone: data.phone,
+    address: data.address,
+    joinDate: data.join_date,
+    totalLessons: 0,
+    lastLesson: null,
+    status: data.status as MemberStatusType,
+    cancellationReason: data.cancellation_reason,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+  };
+
+  return { data: member, error: null };
 }
 
 // 新規会員を登録
