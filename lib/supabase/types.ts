@@ -241,13 +241,16 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           id: string
+          role_id: number
           name: string
           email: string
           phone: string
+          address: string
           status: number
+          cancellation_reason: string
+          join_date: string
           reservation_count: number
           latest_reserved_at: string
-          join_date: string
         }[]
       }
     }
