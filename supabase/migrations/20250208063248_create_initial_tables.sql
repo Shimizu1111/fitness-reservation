@@ -27,7 +27,7 @@ create table fitness_reservation_lesson_types (
 -- レッスンテーブル
 create table fitness_reservation_lessons (
     id bigserial primary key, -- レッスンの一意なID（連番）
-    trainer_id uuid not null references fitness_reservation_users(id) on delete cascade, -- 担当トレーナーのID（外部キー）
+    user_id uuid not null references fitness_reservation_users(id) on delete cascade, -- 担当トレーナーのID（外部キー）
     lesson_type_id bigint not null references fitness_reservation_lesson_types(id) on delete cascade, -- レッスン種別のID（外部キー）
     scheduled_start_at timestamp with time zone not null, -- レッスン開始時間
     scheduled_end_at timestamp with time zone not null, -- レッスン終了時間
@@ -133,7 +133,7 @@ ON fitness_reservation_lessons
 FOR UPDATE
 USING (
     (SELECT role_id FROM fitness_reservation_users WHERE id = auth.uid()) = 2
-    AND trainer_id = auth.uid()
+    AND user_id = auth.uid()
 );
 
 CREATE POLICY "トレーナーのレッスン削除" -- トレーナーは自分のレッスンを削除可能
@@ -141,7 +141,7 @@ ON fitness_reservation_lessons
 FOR DELETE
 USING (
     (SELECT role_id FROM fitness_reservation_users WHERE id = auth.uid()) = 2
-    AND trainer_id = auth.uid()
+    AND user_id = auth.uid()
 );
 
 CREATE POLICY "オーナーのレッスン管理" -- オーナーは全てのレッスンを作成・編集・削除可能
@@ -164,7 +164,7 @@ USING (
     EXISTS (
         SELECT 1 FROM fitness_reservation_lessons
         WHERE fitness_reservation_lessons.id = fitness_reservation_reservations.lesson_id
-        AND trainer_id = auth.uid()
+        AND user_id = auth.uid()
     )
 );
 
