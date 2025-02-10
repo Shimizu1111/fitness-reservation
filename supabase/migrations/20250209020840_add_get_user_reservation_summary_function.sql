@@ -34,3 +34,6 @@ BEGIN
     GROUP BY u.id, u.name, u.email, u.phone, u.status;
 END;
 $$;
+
+-- 関数の検索パスをpublicに設定
+ALTER FUNCTION get_user_reservation_summary() SET search_path = public;

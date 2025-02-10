@@ -20,8 +20,8 @@ if [ "$ENVIRONMENT" = "local" ]; then
     exit 1
   fi
 elif [ "$ENVIRONMENT" = "prd" ]; then
-  if [ -f .env.prd ]; then
-    source .env.prd
+  if [ -f .env ]; then
+    source .env
     echo "⚠️  You are about to run this script on the **PRODUCTION** environment!"
     read -p "Are you sure you want to proceed? Type 'yes' to confirm: " CONFIRM
     if [ "$CONFIRM" != "yes" ]; then
@@ -29,7 +29,7 @@ elif [ "$ENVIRONMENT" = "prd" ]; then
       exit 1
     fi
   else
-    echo "❌ .env.prd file not found!"
+    echo "❌ .env file not found!"
     exit 1
   fi
 else

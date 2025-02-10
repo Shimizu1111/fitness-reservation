@@ -103,6 +103,15 @@ CREATE SCHEMA storage;
 ALTER SCHEMA storage OWNER TO supabase_admin;
 
 --
+-- Name: supabase_migrations; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA supabase_migrations;
+
+
+ALTER SCHEMA supabase_migrations OWNER TO postgres;
+
+--
 -- Name: vault; Type: SCHEMA; Schema: -; Owner: supabase_admin
 --
 
@@ -773,17 +782,22 @@ ALTER FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, targ
 -- Name: get_user_reservation_summary(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_user_reservation_summary() RETURNS TABLE(id uuid, name text, email text, phone text, status smallint, reservation_count bigint, latest_reserved_at timestamp with time zone)
+CREATE FUNCTION public.get_user_reservation_summary() RETURNS TABLE(id uuid, role_id smallint, name text, email text, phone text, address text, status smallint, cancellation_reason text, join_date timestamp with time zone, reservation_count bigint, latest_reserved_at timestamp with time zone)
     LANGUAGE plpgsql
+    SET search_path TO 'public'
     AS $$
 BEGIN
     RETURN QUERY
     SELECT 
         u.id, 
+        u.role_id,
         u.name, 
         u.email, 
         u.phone, 
+        u.address,
         u.status,
+        u.cancellation_reason,
+        u.join_date,
         COUNT(r.id) AS reservation_count,
         MAX(r.reserved_at) AS latest_reserved_at
     FROM fitness_reservation_users u
@@ -2334,7 +2348,7 @@ ALTER SEQUENCE public.fitness_reservation_lesson_types_id_seq OWNED BY public.fi
 
 CREATE TABLE public.fitness_reservation_lessons (
     id bigint NOT NULL,
-    trainer_id uuid NOT NULL,
+    user_id uuid NOT NULL,
     lesson_type_id bigint NOT NULL,
     scheduled_start_at timestamp with time zone NOT NULL,
     scheduled_end_at timestamp with time zone NOT NULL,
@@ -2641,6 +2655,31 @@ CREATE TABLE storage.s3_multipart_uploads_parts (
 
 
 ALTER TABLE storage.s3_multipart_uploads_parts OWNER TO supabase_storage_admin;
+
+--
+-- Name: schema_migrations; Type: TABLE; Schema: supabase_migrations; Owner: postgres
+--
+
+CREATE TABLE supabase_migrations.schema_migrations (
+    version text NOT NULL,
+    statements text[],
+    name text
+);
+
+
+ALTER TABLE supabase_migrations.schema_migrations OWNER TO postgres;
+
+--
+-- Name: seed_files; Type: TABLE; Schema: supabase_migrations; Owner: postgres
+--
+
+CREATE TABLE supabase_migrations.seed_files (
+    path text NOT NULL,
+    hash text NOT NULL
+);
+
+
+ALTER TABLE supabase_migrations.seed_files OWNER TO postgres;
 
 --
 -- Name: decrypted_secrets; Type: VIEW; Schema: vault; Owner: supabase_admin
@@ -2997,6 +3036,22 @@ ALTER TABLE ONLY storage.s3_multipart_uploads_parts
 
 ALTER TABLE ONLY storage.s3_multipart_uploads
     ADD CONSTRAINT s3_multipart_uploads_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: supabase_migrations; Owner: postgres
+--
+
+ALTER TABLE ONLY supabase_migrations.schema_migrations
+    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: seed_files seed_files_pkey; Type: CONSTRAINT; Schema: supabase_migrations; Owner: postgres
+--
+
+ALTER TABLE ONLY supabase_migrations.seed_files
+    ADD CONSTRAINT seed_files_pkey PRIMARY KEY (path);
 
 
 --
@@ -3439,11 +3494,11 @@ ALTER TABLE ONLY public.fitness_reservation_lessons
 
 
 --
--- Name: fitness_reservation_lessons fitness_reservation_lessons_trainer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: fitness_reservation_lessons fitness_reservation_lessons_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.fitness_reservation_lessons
-    ADD CONSTRAINT fitness_reservation_lessons_trainer_id_fkey FOREIGN KEY (trainer_id) REFERENCES public.fitness_reservation_users(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fitness_reservation_lessons_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.fitness_reservation_users(id) ON DELETE CASCADE;
 
 
 --
@@ -3678,7 +3733,7 @@ CREATE POLICY "オーナーの通知管理" ON public.fitness_reservation_notifi
 
 CREATE POLICY "トレーナーのレッスン削除" ON public.fitness_reservation_lessons FOR DELETE USING (((( SELECT fitness_reservation_users.role_id
    FROM public.fitness_reservation_users
-  WHERE (fitness_reservation_users.id = auth.uid())) = 2) AND (trainer_id = auth.uid())));
+  WHERE (fitness_reservation_users.id = auth.uid())) = 2) AND (user_id = auth.uid())));
 
 
 --
@@ -3687,7 +3742,7 @@ CREATE POLICY "トレーナーのレッスン削除" ON public.fitness_reservati
 
 CREATE POLICY "トレーナーのレッスン編集" ON public.fitness_reservation_lessons FOR UPDATE USING (((( SELECT fitness_reservation_users.role_id
    FROM public.fitness_reservation_users
-  WHERE (fitness_reservation_users.id = auth.uid())) = 2) AND (trainer_id = auth.uid())));
+  WHERE (fitness_reservation_users.id = auth.uid())) = 2) AND (user_id = auth.uid())));
 
 
 --
@@ -3696,7 +3751,7 @@ CREATE POLICY "トレーナーのレッスン編集" ON public.fitness_reservati
 
 CREATE POLICY "トレーナーの予約参照" ON public.fitness_reservation_reservations FOR SELECT USING ((EXISTS ( SELECT 1
    FROM public.fitness_reservation_lessons
-  WHERE ((fitness_reservation_lessons.id = fitness_reservation_reservations.lesson_id) AND (fitness_reservation_lessons.trainer_id = auth.uid())))));
+  WHERE ((fitness_reservation_lessons.id = fitness_reservation_reservations.lesson_id) AND (fitness_reservation_lessons.user_id = auth.uid())))));
 
 
 --
