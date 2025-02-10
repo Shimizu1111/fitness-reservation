@@ -6,7 +6,7 @@ lesson_types AS (
   SELECT id, name FROM fitness_reservation_lesson_types
 )
 INSERT INTO fitness_reservation_lessons (
-    trainer_id, lesson_type_id, scheduled_start_at, scheduled_end_at, 
+    user_id, lesson_type_id, scheduled_start_at, scheduled_end_at, 
     max_participants, location, status, memo
 )
 VALUES
