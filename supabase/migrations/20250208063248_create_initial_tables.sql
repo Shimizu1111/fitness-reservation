@@ -3,13 +3,15 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ユーザーテーブル
 create table fitness_reservation_users (
     id uuid primary key default uuid_generate_v4(), -- ユーザーの一意なID（UUID）
-    role_id smallint not null, -- ユーザーの役割（1:オーナー, 2:トレーナー, 3:顧客）
+    role user_role not null, -- ユーザーの役割
     name text not null, -- ユーザーの名前
     password text not null, -- ハッシュ化されたパスワード（アプリ側でハッシュ化）
     email text not null unique, -- ユーザーのメールアドレス（ユニーク制約あり）
     phone text, -- ユーザーの電話番号（オプション）
     address text, -- ユーザーの住所（オプション）
-    status smallint not null, -- ユーザーのステータス（1:アクティブ, 2:休会, 3:退会）
+    owner_status owner_status,        -- オーナー用ステータス
+    trainer_status trainer_status,    -- トレーナー用ステータス
+    customer_status customer_status, -- 顧客用ステータス
     cancellation_reason text, -- 退会理由（退会済みユーザーのみ設定）
     join_date timestamp with time zone default now() not null, -- 入会日
     created_at timestamp with time zone default now(), -- ユーザー登録日時
@@ -24,8 +26,8 @@ create table fitness_reservation_lessons (
     scheduled_start_at timestamp with time zone not null, -- レッスン開始時間
     scheduled_end_at timestamp with time zone not null, -- レッスン終了時間
     max_participants smallint not null, -- 最大参加人数
-    location smallint not null, -- レッスンの開催場所（1:スタジオA, 2:スタジオB, 3:オンライン）
-    status smallint not null, -- レッスンのステータス（1:予定, 2:進行中, 3:完了, 4:キャンセル）
+    location lesson_location not null, -- レッスンの開催場所
+    status lesson_status not null, -- レッスンのステータス
     memo text, -- レッスンのメモ（オプション）
     created_at timestamp with time zone default now(), -- レッスン作成日時
     updated_at timestamp with time zone default now() -- 最終更新日時
@@ -36,7 +38,7 @@ create table fitness_reservation_reservations (
     id bigserial primary key, -- 予約の一意なID（連番）
     lesson_id bigint not null references fitness_reservation_lessons(id) on delete cascade, -- 予約したレッスンのID（外部キー）
     user_id uuid not null references fitness_reservation_users(id) on delete cascade, -- 予約者のユーザーID（外部キー）
-    status smallint not null, -- 予約のステータス（1:確定, 2:キャンセル, 3:キャンセル待ち）
+    status reservation_status not null, -- 予約のステータス
     attended boolean, -- 出席状況（true: 出席, false: 欠席, NULL: 未確定）
     reserved_at timestamp with time zone not null default now(), -- 予約日時
     cancelled_at timestamp with time zone, -- キャンセル日時（キャンセル時のみセット）
@@ -50,7 +52,7 @@ create table fitness_reservation_notifications (
     user_id uuid not null references fitness_reservation_users(id) on delete cascade, -- 通知対象のユーザーID（外部キー）
     title text not null, -- 通知タイトル
     content text not null, -- 通知内容
-    notification_type smallint not null, -- 通知の種類（1:予約確定, 2:予約キャンセル, 3:予約枠が空いた）
+    notification_type notification_type not null, -- 通知の種類
     is_read boolean not null default false, -- 既読フラグ（true: 既読, false: 未読）
     created_at timestamp with time zone default now(), -- 通知作成日時
     updated_at timestamp with time zone default now() -- 最終更新日時
@@ -69,19 +71,19 @@ ALTER TABLE fitness_reservation_reservations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE fitness_reservation_notifications ENABLE ROW LEVEL SECURITY;
 
 -- アクセス制御関数
-CREATE OR REPLACE FUNCTION can_access_fitness_user(user_id uuid, target_id uuid, target_role int)
+CREATE OR REPLACE FUNCTION can_access_fitness_user(user_id uuid, target_id uuid, target_role user_role)
 RETURNS boolean AS $$
 BEGIN
     RETURN (
         -- オーナー: 全データにアクセス可能
-        (SELECT role_id FROM fitness_reservation_users WHERE id = user_id) = 1
+        (SELECT role FROM fitness_reservation_users WHERE id = user_id) = 'オーナー'
 
         -- トレーナー: 自分のデータと全顧客データにアクセス可能
-        OR (user_id = target_id AND target_role = 2)
-        OR (target_role = 3 AND (SELECT role_id FROM fitness_reservation_users WHERE id = user_id) = 2)
+        OR (user_id = target_id AND target_role = 'トレーナー')
+        OR (target_role = '顧客' AND (SELECT role FROM fitness_reservation_users WHERE id = user_id) = 'トレーナー')
 
         -- 顧客: 自分のデータにのみアクセス可能
-        OR (user_id = target_id AND target_role = 3)
+        OR (user_id = target_id AND target_role = '顧客')
     );
 END;
 $$ LANGUAGE plpgsql;
@@ -92,11 +94,11 @@ ON fitness_reservation_users
 FOR ALL
 USING (
     auth.uid() IS NOT NULL AND 
-    can_access_fitness_user(auth.uid(), id, role_id)
+    can_access_fitness_user(auth.uid(), id, role)
 )
 WITH CHECK (
     auth.uid() IS NOT NULL AND 
-    can_access_fitness_user(auth.uid(), id, role_id)
+    can_access_fitness_user(auth.uid(), id, role)
 );
 
 -- レッスンの操作を制御するポリシー
@@ -109,7 +111,7 @@ CREATE POLICY "トレーナーのレッスン編集" -- トレーナーは自分
 ON fitness_reservation_lessons
 FOR UPDATE
 USING (
-    (SELECT role_id FROM fitness_reservation_users WHERE id = auth.uid()) = 2
+    (SELECT role FROM fitness_reservation_users WHERE id = auth.uid()) = 'トレーナー'
     AND user_id = auth.uid()
 );
 
@@ -117,15 +119,15 @@ CREATE POLICY "トレーナーのレッスン削除" -- トレーナーは自分
 ON fitness_reservation_lessons
 FOR DELETE
 USING (
-    (SELECT role_id FROM fitness_reservation_users WHERE id = auth.uid()) = 2
+    (SELECT role FROM fitness_reservation_users WHERE id = auth.uid()) = 'トレーナー'
     AND user_id = auth.uid()
 );
 
 CREATE POLICY "オーナーのレッスン管理" -- オーナーは全てのレッスンを作成・編集・削除可能
 ON fitness_reservation_lessons
 FOR ALL
-USING ((SELECT role_id FROM fitness_reservation_users WHERE id = auth.uid()) = 1)
-WITH CHECK ((SELECT role_id FROM fitness_reservation_users WHERE id = auth.uid()) = 1);
+USING ((SELECT role FROM fitness_reservation_users WHERE id = auth.uid()) = 'オーナー')
+WITH CHECK ((SELECT role FROM fitness_reservation_users WHERE id = auth.uid()) = 'オーナー');
 
 -- 予約の操作を制御するポリシー
 CREATE POLICY "顧客の予約管理" -- 顧客が自分の予約を操作可能
@@ -148,8 +150,8 @@ USING (
 CREATE POLICY "オーナーの予約管理" -- オーナーが全ての予約を管理可能
 ON fitness_reservation_reservations
 FOR ALL
-USING ((SELECT role_id FROM fitness_reservation_users WHERE id = auth.uid()) = 1)
-WITH CHECK ((SELECT role_id FROM fitness_reservation_users WHERE id = auth.uid()) = 1);
+USING ((SELECT role FROM fitness_reservation_users WHERE id = auth.uid()) = 'オーナー')
+WITH CHECK ((SELECT role FROM fitness_reservation_users WHERE id = auth.uid()) = 'オーナー');
 
 -- 通知設定の操作を制御するポリシー
 CREATE POLICY "顧客の通知参照" -- 自分宛の通知のみ参照可能
@@ -160,5 +162,5 @@ USING (auth.uid() = user_id);
 CREATE POLICY "オーナーの通知管理" -- オーナーは全ての通知を管理可能
 ON fitness_reservation_notifications
 FOR ALL
-USING ((SELECT role_id FROM fitness_reservation_users WHERE id = auth.uid()) = 1)
-WITH CHECK ((SELECT role_id FROM fitness_reservation_users WHERE id = auth.uid()) = 1);
+USING ((SELECT role FROM fitness_reservation_users WHERE id = auth.uid()) = 'オーナー')
+WITH CHECK ((SELECT role FROM fitness_reservation_users WHERE id = auth.uid()) = 'オーナー');

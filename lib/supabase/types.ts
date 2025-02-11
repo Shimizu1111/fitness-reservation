@@ -13,39 +13,39 @@ export type Database = {
         Row: {
           created_at: string | null
           id: number
-          location: number
+          location: Database["public"]["Enums"]["lesson_location"]
           max_participants: number
           memo: string | null
           name: string
           scheduled_end_at: string
           scheduled_start_at: string
-          status: number
+          status: Database["public"]["Enums"]["lesson_status"]
           updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: number
-          location: number
+          location: Database["public"]["Enums"]["lesson_location"]
           max_participants: number
           memo?: string | null
           name: string
           scheduled_end_at: string
           scheduled_start_at: string
-          status: number
+          status: Database["public"]["Enums"]["lesson_status"]
           updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
           id?: number
-          location?: number
+          location?: Database["public"]["Enums"]["lesson_location"]
           max_participants?: number
           memo?: string | null
           name?: string
           scheduled_end_at?: string
           scheduled_start_at?: string
-          status?: number
+          status?: Database["public"]["Enums"]["lesson_status"]
           updated_at?: string | null
           user_id?: string
         }
@@ -65,7 +65,7 @@ export type Database = {
           created_at: string | null
           id: number
           is_read: boolean
-          notification_type: number
+          notification_type: Database["public"]["Enums"]["notification_type"]
           title: string
           updated_at: string | null
           user_id: string
@@ -75,7 +75,7 @@ export type Database = {
           created_at?: string | null
           id?: number
           is_read?: boolean
-          notification_type: number
+          notification_type: Database["public"]["Enums"]["notification_type"]
           title: string
           updated_at?: string | null
           user_id: string
@@ -85,7 +85,7 @@ export type Database = {
           created_at?: string | null
           id?: number
           is_read?: boolean
-          notification_type?: number
+          notification_type?: Database["public"]["Enums"]["notification_type"]
           title?: string
           updated_at?: string | null
           user_id?: string
@@ -108,7 +108,7 @@ export type Database = {
           id: number
           lesson_id: number
           reserved_at: string
-          status: number
+          status: Database["public"]["Enums"]["reservation_status"]
           updated_at: string | null
           user_id: string
         }
@@ -119,7 +119,7 @@ export type Database = {
           id?: number
           lesson_id: number
           reserved_at?: string
-          status: number
+          status: Database["public"]["Enums"]["reservation_status"]
           updated_at?: string | null
           user_id: string
         }
@@ -130,7 +130,7 @@ export type Database = {
           id?: number
           lesson_id?: number
           reserved_at?: string
-          status?: number
+          status?: Database["public"]["Enums"]["reservation_status"]
           updated_at?: string | null
           user_id?: string
         }
@@ -156,42 +156,52 @@ export type Database = {
           address: string | null
           cancellation_reason: string | null
           created_at: string | null
+          customer_status: Database["public"]["Enums"]["customer_status"] | null
           email: string
           id: string
           join_date: string
           name: string
+          owner_status: Database["public"]["Enums"]["owner_status"] | null
           password: string
           phone: string | null
-          role_id: number
-          status: number
+          role: Database["public"]["Enums"]["user_role"]
+          trainer_status: Database["public"]["Enums"]["trainer_status"] | null
           updated_at: string | null
         }
         Insert: {
           address?: string | null
           cancellation_reason?: string | null
           created_at?: string | null
+          customer_status?:
+            | Database["public"]["Enums"]["customer_status"]
+            | null
           email: string
           id?: string
           join_date?: string
           name: string
+          owner_status?: Database["public"]["Enums"]["owner_status"] | null
           password: string
           phone?: string | null
-          role_id: number
-          status: number
+          role: Database["public"]["Enums"]["user_role"]
+          trainer_status?: Database["public"]["Enums"]["trainer_status"] | null
           updated_at?: string | null
         }
         Update: {
           address?: string | null
           cancellation_reason?: string | null
           created_at?: string | null
+          customer_status?:
+            | Database["public"]["Enums"]["customer_status"]
+            | null
           email?: string
           id?: string
           join_date?: string
           name?: string
+          owner_status?: Database["public"]["Enums"]["owner_status"] | null
           password?: string
           phone?: string | null
-          role_id?: number
-          status?: number
+          role?: Database["public"]["Enums"]["user_role"]
+          trainer_status?: Database["public"]["Enums"]["trainer_status"] | null
           updated_at?: string | null
         }
         Relationships: []
@@ -205,7 +215,7 @@ export type Database = {
         Args: {
           user_id: string
           target_id: string
-          target_role: number
+          target_role: Database["public"]["Enums"]["user_role"]
         }
         Returns: boolean
       }
@@ -213,12 +223,12 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           id: string
-          role_id: number
+          role: Database["public"]["Enums"]["user_role"]
           name: string
           email: string
           phone: string
           address: string
-          status: number
+          status: Database["public"]["Enums"]["owner_status"]
           cancellation_reason: string
           join_date: string
           reservation_count: number
@@ -228,20 +238,29 @@ export type Database = {
       get_lessons_for_owner: {
         Args: Record<PropertyKey, never>
         Returns: {
-          id: string
+          id: number
           name: string
           scheduled_start_at: string
           scheduled_end_at: string
-          location: number
-          status: number
+          location: Database["public"]["Enums"]["lesson_location"]
+          status: Database["public"]["Enums"]["lesson_status"]
           memo: string
           max_participants: number
+          user_id: string
+          user_name: string
           participants_count: number
         }[]
       }
     }
     Enums: {
-      [_ in never]: never
+      customer_status: "アクティブ" | "休会" | "退会"
+      lesson_location: "スタジオA" | "スタジオB" | "オンライン"
+      lesson_status: "予定" | "進行中" | "完了" | "キャンセル"
+      notification_type: "予約確定" | "予約キャンセル" | "予約枠が空いた"
+      owner_status: "アクティブ" | "一時停止" | "停止"
+      reservation_status: "予約確定" | "キャンセル待ち" | "キャンセル済み"
+      trainer_status: "アクティブ" | "一時停止" | "停止"
+      user_role: "オーナー" | "トレーナー" | "顧客"
     }
     CompositeTypes: {
       [_ in never]: never

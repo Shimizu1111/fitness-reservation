@@ -271,6 +271,111 @@ CREATE TYPE auth.one_time_token_type AS ENUM (
 ALTER TYPE auth.one_time_token_type OWNER TO supabase_auth_admin;
 
 --
+-- Name: customer_status; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.customer_status AS ENUM (
+    'アクティブ',
+    '休会',
+    '退会'
+);
+
+
+ALTER TYPE public.customer_status OWNER TO postgres;
+
+--
+-- Name: lesson_location; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.lesson_location AS ENUM (
+    'スタジオA',
+    'スタジオB',
+    'オンライン'
+);
+
+
+ALTER TYPE public.lesson_location OWNER TO postgres;
+
+--
+-- Name: lesson_status; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.lesson_status AS ENUM (
+    '予定',
+    '進行中',
+    '完了',
+    'キャンセル'
+);
+
+
+ALTER TYPE public.lesson_status OWNER TO postgres;
+
+--
+-- Name: notification_type; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.notification_type AS ENUM (
+    '予約確定',
+    '予約キャンセル',
+    '予約枠が空いた'
+);
+
+
+ALTER TYPE public.notification_type OWNER TO postgres;
+
+--
+-- Name: owner_status; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.owner_status AS ENUM (
+    'アクティブ',
+    '一時停止',
+    '停止'
+);
+
+
+ALTER TYPE public.owner_status OWNER TO postgres;
+
+--
+-- Name: reservation_status; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.reservation_status AS ENUM (
+    '予約確定',
+    'キャンセル待ち',
+    'キャンセル済み'
+);
+
+
+ALTER TYPE public.reservation_status OWNER TO postgres;
+
+--
+-- Name: trainer_status; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.trainer_status AS ENUM (
+    'アクティブ',
+    '一時停止',
+    '停止'
+);
+
+
+ALTER TYPE public.trainer_status OWNER TO postgres;
+
+--
+-- Name: user_role; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.user_role AS ENUM (
+    'オーナー',
+    'トレーナー',
+    '顧客'
+);
+
+
+ALTER TYPE public.user_role OWNER TO postgres;
+
+--
 -- Name: action; Type: TYPE; Schema: realtime; Owner: supabase_admin
 --
 
@@ -753,36 +858,36 @@ $$;
 ALTER FUNCTION pgbouncer.get_auth(p_usename text) OWNER TO postgres;
 
 --
--- Name: can_access_fitness_user(uuid, uuid, integer); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: can_access_fitness_user(uuid, uuid, public.user_role); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, target_role integer) RETURNS boolean
+CREATE FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, target_role public.user_role) RETURNS boolean
     LANGUAGE plpgsql SECURITY DEFINER
     SET search_path TO 'public'
     AS $$
 BEGIN
     RETURN (
         -- オーナー: 全データにアクセス可能
-        (SELECT role_id FROM public.fitness_reservation_users WHERE id = user_id) = 1
+        (SELECT role FROM public.fitness_reservation_users WHERE id = user_id) = 'オーナー'
         
         -- トレーナー: 自分のデータと全顧客データにアクセス可能
-        OR (user_id = target_id AND target_role = 2)
-        OR (target_role = 3 AND (SELECT role_id FROM public.fitness_reservation_users WHERE id = user_id) = 2)
+        OR (user_id = target_id AND target_role = 'トレーナー')
+        OR (target_role = '顧客' AND (SELECT role FROM public.fitness_reservation_users WHERE id = user_id) = 'トレーナー')
         
         -- 顧客: 自分のデータにのみアクセス可能
-        OR (user_id = target_id AND target_role = 3)
+        OR (user_id = target_id AND target_role = '顧客')
     );
 END;
 $$;
 
 
-ALTER FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, target_role integer) OWNER TO postgres;
+ALTER FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, target_role public.user_role) OWNER TO postgres;
 
 --
 -- Name: get_customers_for_owner(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_customers_for_owner() RETURNS TABLE(id uuid, role_id smallint, name text, email text, phone text, address text, status smallint, cancellation_reason text, join_date timestamp with time zone, reservation_count bigint, latest_reserved_at timestamp with time zone)
+CREATE FUNCTION public.get_customers_for_owner() RETURNS TABLE(id uuid, role public.user_role, name text, email text, phone text, address text, status public.owner_status, cancellation_reason text, join_date timestamp with time zone, reservation_count bigint, latest_reserved_at timestamp with time zone)
     LANGUAGE plpgsql
     SET search_path TO 'public'
     AS $$
@@ -790,7 +895,7 @@ BEGIN
     RETURN QUERY
     SELECT 
         u.id, 
-        u.role_id,
+        u.role,
         u.name, 
         u.email, 
         u.phone, 
@@ -814,7 +919,7 @@ ALTER FUNCTION public.get_customers_for_owner() OWNER TO postgres;
 -- Name: get_lessons_for_owner(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_lessons_for_owner() RETURNS TABLE(id uuid, name text, scheduled_start_at timestamp with time zone, scheduled_end_at timestamp with time zone, location smallint, status smallint, memo text, max_participants smallint, participants_count bigint)
+CREATE FUNCTION public.get_lessons_for_owner() RETURNS TABLE(id bigint, name text, scheduled_start_at timestamp with time zone, scheduled_end_at timestamp with time zone, location public.lesson_location, status public.lesson_status, memo text, max_participants smallint, user_id uuid, user_name text, participants_count bigint)
     LANGUAGE plpgsql
     SET search_path TO 'public'
     AS $$
@@ -829,11 +934,16 @@ BEGIN
         l.status, 
         l.memo, 
         l.max_participants,
+        u.id AS user_id, 
+        u.name AS user_name, 
         COUNT(r.user_id) AS participants_count
     FROM fitness_reservation_lessons l
     LEFT JOIN fitness_reservation_reservations r 
     ON l.id = r.lesson_id
-    GROUP BY l.id, l.name, l.scheduled_start_at, l.scheduled_end_at, l.location, l.status, l.memo, l.max_participants
+    LEFT JOIN fitness_reservation_users u 
+    ON l.user_id = u.id
+    GROUP BY l.id, l.name, l.scheduled_start_at, l.scheduled_end_at, 
+             l.location, l.status, l.memo, l.max_participants, u.id, u.name
     ORDER BY l.id DESC;
 END;
 $$;
@@ -2349,8 +2459,8 @@ CREATE TABLE public.fitness_reservation_lessons (
     scheduled_start_at timestamp with time zone NOT NULL,
     scheduled_end_at timestamp with time zone NOT NULL,
     max_participants smallint NOT NULL,
-    location smallint NOT NULL,
-    status smallint NOT NULL,
+    location public.lesson_location NOT NULL,
+    status public.lesson_status NOT NULL,
     memo text,
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
@@ -2389,7 +2499,7 @@ CREATE TABLE public.fitness_reservation_notifications (
     user_id uuid NOT NULL,
     title text NOT NULL,
     content text NOT NULL,
-    notification_type smallint NOT NULL,
+    notification_type public.notification_type NOT NULL,
     is_read boolean DEFAULT false NOT NULL,
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
@@ -2427,7 +2537,7 @@ CREATE TABLE public.fitness_reservation_reservations (
     id bigint NOT NULL,
     lesson_id bigint NOT NULL,
     user_id uuid NOT NULL,
-    status smallint NOT NULL,
+    status public.reservation_status NOT NULL,
     attended boolean,
     reserved_at timestamp with time zone DEFAULT now() NOT NULL,
     cancelled_at timestamp with time zone,
@@ -2465,13 +2575,15 @@ ALTER SEQUENCE public.fitness_reservation_reservations_id_seq OWNED BY public.fi
 
 CREATE TABLE public.fitness_reservation_users (
     id uuid DEFAULT extensions.uuid_generate_v4() NOT NULL,
-    role_id smallint NOT NULL,
+    role public.user_role NOT NULL,
     name text NOT NULL,
     password text NOT NULL,
     email text NOT NULL,
     phone text,
     address text,
-    status smallint NOT NULL,
+    owner_status public.owner_status,
+    trainer_status public.trainer_status,
+    customer_status public.customer_status,
     cancellation_reason text,
     join_date timestamp with time zone DEFAULT now() NOT NULL,
     created_at timestamp with time zone DEFAULT now(),
@@ -3654,51 +3766,51 @@ ALTER TABLE public.fitness_reservation_users ENABLE ROW LEVEL SECURITY;
 -- Name: fitness_reservation_lessons オーナーのレッスン管理; Type: POLICY; Schema: public; Owner: postgres
 --
 
-CREATE POLICY "オーナーのレッスン管理" ON public.fitness_reservation_lessons USING ((( SELECT fitness_reservation_users.role_id
+CREATE POLICY "オーナーのレッスン管理" ON public.fitness_reservation_lessons USING ((( SELECT fitness_reservation_users.role
    FROM public.fitness_reservation_users
-  WHERE (fitness_reservation_users.id = auth.uid())) = 1)) WITH CHECK ((( SELECT fitness_reservation_users.role_id
+  WHERE (fitness_reservation_users.id = auth.uid())) = 'オーナー'::public.user_role)) WITH CHECK ((( SELECT fitness_reservation_users.role
    FROM public.fitness_reservation_users
-  WHERE (fitness_reservation_users.id = auth.uid())) = 1));
+  WHERE (fitness_reservation_users.id = auth.uid())) = 'オーナー'::public.user_role));
 
 
 --
 -- Name: fitness_reservation_reservations オーナーの予約管理; Type: POLICY; Schema: public; Owner: postgres
 --
 
-CREATE POLICY "オーナーの予約管理" ON public.fitness_reservation_reservations USING ((( SELECT fitness_reservation_users.role_id
+CREATE POLICY "オーナーの予約管理" ON public.fitness_reservation_reservations USING ((( SELECT fitness_reservation_users.role
    FROM public.fitness_reservation_users
-  WHERE (fitness_reservation_users.id = auth.uid())) = 1)) WITH CHECK ((( SELECT fitness_reservation_users.role_id
+  WHERE (fitness_reservation_users.id = auth.uid())) = 'オーナー'::public.user_role)) WITH CHECK ((( SELECT fitness_reservation_users.role
    FROM public.fitness_reservation_users
-  WHERE (fitness_reservation_users.id = auth.uid())) = 1));
+  WHERE (fitness_reservation_users.id = auth.uid())) = 'オーナー'::public.user_role));
 
 
 --
 -- Name: fitness_reservation_notifications オーナーの通知管理; Type: POLICY; Schema: public; Owner: postgres
 --
 
-CREATE POLICY "オーナーの通知管理" ON public.fitness_reservation_notifications USING ((( SELECT fitness_reservation_users.role_id
+CREATE POLICY "オーナーの通知管理" ON public.fitness_reservation_notifications USING ((( SELECT fitness_reservation_users.role
    FROM public.fitness_reservation_users
-  WHERE (fitness_reservation_users.id = auth.uid())) = 1)) WITH CHECK ((( SELECT fitness_reservation_users.role_id
+  WHERE (fitness_reservation_users.id = auth.uid())) = 'オーナー'::public.user_role)) WITH CHECK ((( SELECT fitness_reservation_users.role
    FROM public.fitness_reservation_users
-  WHERE (fitness_reservation_users.id = auth.uid())) = 1));
+  WHERE (fitness_reservation_users.id = auth.uid())) = 'オーナー'::public.user_role));
 
 
 --
 -- Name: fitness_reservation_lessons トレーナーのレッスン削除; Type: POLICY; Schema: public; Owner: postgres
 --
 
-CREATE POLICY "トレーナーのレッスン削除" ON public.fitness_reservation_lessons FOR DELETE USING (((( SELECT fitness_reservation_users.role_id
+CREATE POLICY "トレーナーのレッスン削除" ON public.fitness_reservation_lessons FOR DELETE USING (((( SELECT fitness_reservation_users.role
    FROM public.fitness_reservation_users
-  WHERE (fitness_reservation_users.id = auth.uid())) = 2) AND (user_id = auth.uid())));
+  WHERE (fitness_reservation_users.id = auth.uid())) = 'トレーナー'::public.user_role) AND (user_id = auth.uid())));
 
 
 --
 -- Name: fitness_reservation_lessons トレーナーのレッスン編集; Type: POLICY; Schema: public; Owner: postgres
 --
 
-CREATE POLICY "トレーナーのレッスン編集" ON public.fitness_reservation_lessons FOR UPDATE USING (((( SELECT fitness_reservation_users.role_id
+CREATE POLICY "トレーナーのレッスン編集" ON public.fitness_reservation_lessons FOR UPDATE USING (((( SELECT fitness_reservation_users.role
    FROM public.fitness_reservation_users
-  WHERE (fitness_reservation_users.id = auth.uid())) = 2) AND (user_id = auth.uid())));
+  WHERE (fitness_reservation_users.id = auth.uid())) = 'トレーナー'::public.user_role) AND (user_id = auth.uid())));
 
 
 --
@@ -3714,7 +3826,7 @@ CREATE POLICY "トレーナーの予約参照" ON public.fitness_reservation_res
 -- Name: fitness_reservation_users ユーザーごとの全操作制御; Type: POLICY; Schema: public; Owner: postgres
 --
 
-CREATE POLICY "ユーザーごとの全操作制御" ON public.fitness_reservation_users USING (((auth.uid() IS NOT NULL) AND public.can_access_fitness_user(auth.uid(), id, (role_id)::integer))) WITH CHECK (((auth.uid() IS NOT NULL) AND public.can_access_fitness_user(auth.uid(), id, (role_id)::integer)));
+CREATE POLICY "ユーザーごとの全操作制御" ON public.fitness_reservation_users USING (((auth.uid() IS NOT NULL) AND public.can_access_fitness_user(auth.uid(), id, role))) WITH CHECK (((auth.uid() IS NOT NULL) AND public.can_access_fitness_user(auth.uid(), id, role)));
 
 
 --
@@ -4448,12 +4560,12 @@ GRANT ALL ON FUNCTION pgsodium.crypto_aead_det_keygen() TO service_role;
 
 
 --
--- Name: FUNCTION can_access_fitness_user(user_id uuid, target_id uuid, target_role integer); Type: ACL; Schema: public; Owner: postgres
+-- Name: FUNCTION can_access_fitness_user(user_id uuid, target_id uuid, target_role public.user_role); Type: ACL; Schema: public; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, target_role integer) TO anon;
-GRANT ALL ON FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, target_role integer) TO authenticated;
-GRANT ALL ON FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, target_role integer) TO service_role;
+GRANT ALL ON FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, target_role public.user_role) TO anon;
+GRANT ALL ON FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, target_role public.user_role) TO authenticated;
+GRANT ALL ON FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, target_role public.user_role) TO service_role;
 
 
 --

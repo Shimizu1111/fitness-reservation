@@ -2,12 +2,12 @@
 CREATE OR REPLACE FUNCTION get_customers_for_owner()
 RETURNS TABLE (
     id UUID,
-    role_id SMALLINT,
+    role user_role,
     name TEXT,
     email TEXT,
     phone TEXT,
     address TEXT,
-    status SMALLINT,
+    status owner_status,
     cancellation_reason TEXT,
     join_date TIMESTAMP WITH TIME ZONE,
     reservation_count BIGINT,
@@ -19,7 +19,7 @@ BEGIN
     RETURN QUERY
     SELECT 
         u.id, 
-        u.role_id,
+        u.role,
         u.name, 
         u.email, 
         u.phone, 
@@ -41,14 +41,16 @@ ALTER FUNCTION get_customers_for_owner() SET search_path = public;
 -- get_lessons_for_owner
 CREATE OR REPLACE FUNCTION get_lessons_for_owner()
 RETURNS TABLE (
-    id UUID,
+    id BIGINT,
     name TEXT,
     scheduled_start_at TIMESTAMP WITH TIME ZONE,
     scheduled_end_at TIMESTAMP WITH TIME ZONE,
-    location SMALLINT,
-    status SMALLINT,
+    location lesson_location,
+    status lesson_status,
     memo TEXT,
     max_participants SMALLINT,
+    user_id UUID,
+    user_name TEXT,
     participants_count BIGINT
 )
 LANGUAGE plpgsql
@@ -64,11 +66,16 @@ BEGIN
         l.status, 
         l.memo, 
         l.max_participants,
+        u.id AS user_id, 
+        u.name AS user_name, 
         COUNT(r.user_id) AS participants_count
     FROM fitness_reservation_lessons l
     LEFT JOIN fitness_reservation_reservations r 
     ON l.id = r.lesson_id
-    GROUP BY l.id, l.name, l.scheduled_start_at, l.scheduled_end_at, l.location, l.status, l.memo, l.max_participants
+    LEFT JOIN fitness_reservation_users u 
+    ON l.user_id = u.id
+    GROUP BY l.id, l.name, l.scheduled_start_at, l.scheduled_end_at, 
+             l.location, l.status, l.memo, l.max_participants, u.id, u.name
     ORDER BY l.id DESC;
 END;
 $$;
