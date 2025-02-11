@@ -209,7 +209,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      get_user_reservation_summary: {
+      get_customers_for_owner: {
         Args: Record<PropertyKey, never>
         Returns: {
           id: string
@@ -223,6 +223,20 @@ export type Database = {
           join_date: string
           reservation_count: number
           latest_reserved_at: string
+        }[]
+      }
+      get_lessons_for_owner: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          name: string
+          scheduled_start_at: string
+          scheduled_end_at: string
+          location: number
+          status: number
+          memo: string
+          max_participants: number
+          participants_count: number
         }[]
       }
     }

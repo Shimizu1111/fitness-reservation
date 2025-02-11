@@ -779,10 +779,10 @@ $$;
 ALTER FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, target_role integer) OWNER TO postgres;
 
 --
--- Name: get_user_reservation_summary(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: get_customers_for_owner(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_user_reservation_summary() RETURNS TABLE(id uuid, role_id smallint, name text, email text, phone text, address text, status smallint, cancellation_reason text, join_date timestamp with time zone, reservation_count bigint, latest_reserved_at timestamp with time zone)
+CREATE FUNCTION public.get_customers_for_owner() RETURNS TABLE(id uuid, role_id smallint, name text, email text, phone text, address text, status smallint, cancellation_reason text, join_date timestamp with time zone, reservation_count bigint, latest_reserved_at timestamp with time zone)
     LANGUAGE plpgsql
     SET search_path TO 'public'
     AS $$
@@ -808,7 +808,38 @@ END;
 $$;
 
 
-ALTER FUNCTION public.get_user_reservation_summary() OWNER TO postgres;
+ALTER FUNCTION public.get_customers_for_owner() OWNER TO postgres;
+
+--
+-- Name: get_lessons_for_owner(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.get_lessons_for_owner() RETURNS TABLE(id uuid, name text, scheduled_start_at timestamp with time zone, scheduled_end_at timestamp with time zone, location smallint, status smallint, memo text, max_participants smallint, participants_count bigint)
+    LANGUAGE plpgsql
+    SET search_path TO 'public'
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        l.id, 
+        l.name, 
+        l.scheduled_start_at, 
+        l.scheduled_end_at, 
+        l.location, 
+        l.status, 
+        l.memo, 
+        l.max_participants,
+        COUNT(r.user_id) AS participants_count
+    FROM fitness_reservation_lessons l
+    LEFT JOIN fitness_reservation_reservations r 
+    ON l.id = r.lesson_id
+    GROUP BY l.id, l.name, l.scheduled_start_at, l.scheduled_end_at, l.location, l.status, l.memo, l.max_participants
+    ORDER BY l.id DESC;
+END;
+$$;
+
+
+ALTER FUNCTION public.get_lessons_for_owner() OWNER TO postgres;
 
 --
 -- Name: apply_rls(jsonb, integer); Type: FUNCTION; Schema: realtime; Owner: supabase_admin
@@ -4426,12 +4457,21 @@ GRANT ALL ON FUNCTION public.can_access_fitness_user(user_id uuid, target_id uui
 
 
 --
--- Name: FUNCTION get_user_reservation_summary(); Type: ACL; Schema: public; Owner: postgres
+-- Name: FUNCTION get_customers_for_owner(); Type: ACL; Schema: public; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION public.get_user_reservation_summary() TO anon;
-GRANT ALL ON FUNCTION public.get_user_reservation_summary() TO authenticated;
-GRANT ALL ON FUNCTION public.get_user_reservation_summary() TO service_role;
+GRANT ALL ON FUNCTION public.get_customers_for_owner() TO anon;
+GRANT ALL ON FUNCTION public.get_customers_for_owner() TO authenticated;
+GRANT ALL ON FUNCTION public.get_customers_for_owner() TO service_role;
+
+
+--
+-- Name: FUNCTION get_lessons_for_owner(); Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION public.get_lessons_for_owner() TO anon;
+GRANT ALL ON FUNCTION public.get_lessons_for_owner() TO authenticated;
+GRANT ALL ON FUNCTION public.get_lessons_for_owner() TO service_role;
 
 
 --

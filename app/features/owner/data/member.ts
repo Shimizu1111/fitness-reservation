@@ -5,11 +5,11 @@ import { getMemberStatusString } from '../constants/member';
 
 type User = Database['public']['Tables']['fitness_reservation_users']['Row'];
 
-export type UserReservationSummary = Database['public']['Functions']['get_user_reservation_summary']['Returns'][number];
+export type UserReservationSummary = Database['public']['Functions']['get_customers_for_owner']['Returns'][number];
 
 // 会員一覧を取得
 export async function getMembers() {
-  const { data: fetchedMembers, error: userError } = await supabase.rpc('get_user_reservation_summary');
+  const { data: fetchedMembers, error: userError } = await supabase.rpc('get_customers_for_owner');
 
   if (userError) {
     console.error('会員データの取得に失敗しました:', userError);
