@@ -39,7 +39,7 @@ function convertToReservation(
       memo: dbReservation.lesson.memo,
       scheduledStartAt: dbReservation.lesson.scheduled_start_at,
       scheduledEndAt: dbReservation.lesson.scheduled_end_at,
-      trainerId: dbReservation.lesson.trainer_id,
+      trainerId: dbReservation.lesson.user_id,
       status: dbReservation.lesson.status as LessonStatusType,
       createdAt: dbReservation.lesson.created_at,
       updatedAt: dbReservation.lesson.updated_at,
@@ -72,7 +72,7 @@ export async function getReservations() {
         lesson_type,
         scheduled_start_at,
         scheduled_end_at,
-        trainer:fitness_reservation_users!trainer_id(
+        trainer:fitness_reservation_users!user_id(
           id,
           name
         )
@@ -112,7 +112,7 @@ export async function cancelReservation(id: number) {
         lesson_type,
         scheduled_start_at,
         scheduled_end_at,
-        trainer:fitness_reservation_users!trainer_id(
+        trainer:fitness_reservation_users!user_id(
           id,
           name
         )
@@ -147,7 +147,7 @@ export async function updateReservationStatus(id: number, status: number) {
         lesson_type,
         scheduled_start_at,
         scheduled_end_at,
-        trainer:fitness_reservation_users!trainer_id(
+        trainer:fitness_reservation_users!user_id(
           id,
           name
         )
@@ -180,7 +180,7 @@ export async function getReservationsByDate(date: string) {
         lesson_type,
         scheduled_start_at,
         scheduled_end_at,
-        trainer:fitness_reservation_users!trainer_id(
+        trainer:fitness_reservation_users!user_id(
           id,
           name
         )
@@ -215,7 +215,7 @@ export async function getReservationsByStatus(status: number) {
         lesson_type,
         scheduled_start_at,
         scheduled_end_at,
-        trainer:fitness_reservation_users!trainer_id(
+        trainer:fitness_reservation_users!user_id(
           id,
           name
         )
@@ -237,4 +237,4 @@ export async function getReservationsByStatus(status: number) {
 
   const reservations = data.map(convertToReservation);
   return { data: reservations, error: null };
-} 
+}

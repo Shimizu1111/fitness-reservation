@@ -2308,48 +2308,13 @@ COMMENT ON COLUMN auth.users.is_sso_user IS 'Auth: Set this column to true when 
 
 
 --
--- Name: fitness_reservation_lesson_types; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.fitness_reservation_lesson_types (
-    id bigint NOT NULL,
-    name text NOT NULL,
-    created_at timestamp with time zone DEFAULT now(),
-    updated_at timestamp with time zone DEFAULT now()
-);
-
-
-ALTER TABLE public.fitness_reservation_lesson_types OWNER TO postgres;
-
---
--- Name: fitness_reservation_lesson_types_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.fitness_reservation_lesson_types_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.fitness_reservation_lesson_types_id_seq OWNER TO postgres;
-
---
--- Name: fitness_reservation_lesson_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.fitness_reservation_lesson_types_id_seq OWNED BY public.fitness_reservation_lesson_types.id;
-
-
---
 -- Name: fitness_reservation_lessons; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.fitness_reservation_lessons (
     id bigint NOT NULL,
+    name text NOT NULL,
     user_id uuid NOT NULL,
-    lesson_type_id bigint NOT NULL,
     scheduled_start_at timestamp with time zone NOT NULL,
     scheduled_end_at timestamp with time zone NOT NULL,
     max_participants smallint NOT NULL,
@@ -2715,13 +2680,6 @@ ALTER TABLE ONLY auth.refresh_tokens ALTER COLUMN id SET DEFAULT nextval('auth.r
 
 
 --
--- Name: fitness_reservation_lesson_types id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.fitness_reservation_lesson_types ALTER COLUMN id SET DEFAULT nextval('public.fitness_reservation_lesson_types_id_seq'::regclass);
-
-
---
 -- Name: fitness_reservation_lessons id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -2916,14 +2874,6 @@ ALTER TABLE ONLY auth.users
 
 ALTER TABLE ONLY auth.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-
-
---
--- Name: fitness_reservation_lesson_types fitness_reservation_lesson_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.fitness_reservation_lesson_types
-    ADD CONSTRAINT fitness_reservation_lesson_types_pkey PRIMARY KEY (id);
 
 
 --
@@ -3486,14 +3436,6 @@ ALTER TABLE ONLY auth.sso_domains
 
 
 --
--- Name: fitness_reservation_lessons fitness_reservation_lessons_lesson_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.fitness_reservation_lessons
-    ADD CONSTRAINT fitness_reservation_lessons_lesson_type_id_fkey FOREIGN KEY (lesson_type_id) REFERENCES public.fitness_reservation_lesson_types(id) ON DELETE CASCADE;
-
-
---
 -- Name: fitness_reservation_lessons fitness_reservation_lessons_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3654,12 +3596,6 @@ ALTER TABLE auth.sso_providers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE auth.users ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: fitness_reservation_lesson_types; Type: ROW SECURITY; Schema: public; Owner: postgres
---
-
-ALTER TABLE public.fitness_reservation_lesson_types ENABLE ROW LEVEL SECURITY;
-
---
 -- Name: fitness_reservation_lessons; Type: ROW SECURITY; Schema: public; Owner: postgres
 --
 
@@ -3682,17 +3618,6 @@ ALTER TABLE public.fitness_reservation_reservations ENABLE ROW LEVEL SECURITY;
 --
 
 ALTER TABLE public.fitness_reservation_users ENABLE ROW LEVEL SECURITY;
-
---
--- Name: fitness_reservation_lesson_types オーナーのレッスン種類管理; Type: POLICY; Schema: public; Owner: postgres
---
-
-CREATE POLICY "オーナーのレッスン種類管理" ON public.fitness_reservation_lesson_types USING ((( SELECT fitness_reservation_users.role_id
-   FROM public.fitness_reservation_users
-  WHERE (fitness_reservation_users.id = auth.uid())) = 1)) WITH CHECK ((( SELECT fitness_reservation_users.role_id
-   FROM public.fitness_reservation_users
-  WHERE (fitness_reservation_users.id = auth.uid())) = 1));
-
 
 --
 -- Name: fitness_reservation_lessons オーナーのレッスン管理; Type: POLICY; Schema: public; Owner: postgres
@@ -3766,13 +3691,6 @@ CREATE POLICY "ユーザーごとの全操作制御" ON public.fitness_reservati
 --
 
 CREATE POLICY "レッスンの参照制御" ON public.fitness_reservation_lessons FOR SELECT USING (true);
-
-
---
--- Name: fitness_reservation_lesson_types レッスン種類の参照制御; Type: POLICY; Schema: public; Owner: postgres
---
-
-CREATE POLICY "レッスン種類の参照制御" ON public.fitness_reservation_lesson_types FOR SELECT USING (true);
 
 
 --
@@ -4837,24 +4755,6 @@ GRANT ALL ON TABLE pgsodium.masking_rule TO pgsodium_keyholder;
 --
 
 GRANT ALL ON TABLE pgsodium.mask_columns TO pgsodium_keyholder;
-
-
---
--- Name: TABLE fitness_reservation_lesson_types; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.fitness_reservation_lesson_types TO anon;
-GRANT ALL ON TABLE public.fitness_reservation_lesson_types TO authenticated;
-GRANT ALL ON TABLE public.fitness_reservation_lesson_types TO service_role;
-
-
---
--- Name: SEQUENCE fitness_reservation_lesson_types_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE public.fitness_reservation_lesson_types_id_seq TO anon;
-GRANT ALL ON SEQUENCE public.fitness_reservation_lesson_types_id_seq TO authenticated;
-GRANT ALL ON SEQUENCE public.fitness_reservation_lesson_types_id_seq TO service_role;
 
 
 --

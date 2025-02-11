@@ -16,7 +16,7 @@ export async function getReservations() {
         date,
         start_time,
         end_time,
-        trainer:fitness_reservation_users!trainer_id(
+        trainer:fitness_reservation_users!user_id(
           id,
           name
         )
@@ -44,7 +44,7 @@ export async function getReservationById(id: string) {
         date,
         start_time,
         end_time,
-        trainer:fitness_reservation_users!trainer_id(
+        trainer:fitness_reservation_users!user_id(
           id,
           name
         )
@@ -103,7 +103,7 @@ export async function getUserReservations(userId: string) {
         date,
         start_time,
         end_time,
-        trainer:fitness_reservation_users!trainer_id(
+        trainer:fitness_reservation_users!user_id(
           id,
           name
         )

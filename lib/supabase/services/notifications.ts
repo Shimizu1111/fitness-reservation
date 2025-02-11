@@ -79,7 +79,7 @@ export async function createLessonNotification(
       type,
       date,
       start_time,
-      trainer:fitness_reservation_users!trainer_id(name)
+      trainer:fitness_reservation_users!user_id(name)
     `)
     .eq('id', lessonId)
     .single()

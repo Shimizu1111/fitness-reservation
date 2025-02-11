@@ -10,7 +10,7 @@ export async function getLessons() {
     .from('fitness_reservation_lessons')
     .select(`
       *,
-      trainer:fitness_reservation_users!trainer_id(
+      trainer:fitness_reservation_users!user_id(
         id,
         name,
         email
@@ -33,7 +33,7 @@ export async function getLessonById(id: string) {
     .from('fitness_reservation_lessons')
     .select(`
       *,
-      trainer:fitness_reservation_users!trainer_id(
+      trainer:fitness_reservation_users!user_id(
         id,
         name,
         email
@@ -104,7 +104,7 @@ export async function getTrainerLessons(trainerId: string) {
         )
       )
     `)
-    .eq('trainer_id', trainerId)
+    .eq('user_id', trainerId)
     .order('date', { ascending: true })
     .order('start_time', { ascending: true })
 
@@ -129,7 +129,7 @@ export async function getTodayLessons() {
     .from('fitness_reservation_lessons')
     .select(`
       *,
-      trainer:fitness_reservation_users!trainer_id(
+      trainer:fitness_reservation_users!user_id(
         id,
         name
       ),

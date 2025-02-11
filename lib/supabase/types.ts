@@ -9,78 +9,50 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      fitness_reservation_lesson_types: {
-        Row: {
-          created_at: string | null
-          id: number
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: number
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: number
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       fitness_reservation_lessons: {
         Row: {
           created_at: string | null
           id: number
-          lesson_type_id: number
           location: number
           max_participants: number
           memo: string | null
+          name: string
           scheduled_end_at: string
           scheduled_start_at: string
           status: number
-          trainer_id: string
           updated_at: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: number
-          lesson_type_id: number
           location: number
           max_participants: number
           memo?: string | null
+          name: string
           scheduled_end_at: string
           scheduled_start_at: string
           status: number
-          trainer_id: string
           updated_at?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string | null
           id?: number
-          lesson_type_id?: number
           location?: number
           max_participants?: number
           memo?: string | null
+          name?: string
           scheduled_end_at?: string
           scheduled_start_at?: string
           status?: number
-          trainer_id?: string
           updated_at?: string | null
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fitness_reservation_lessons_lesson_type_id_fkey"
-            columns: ["lesson_type_id"]
-            isOneToOne: false
-            referencedRelation: "fitness_reservation_lesson_types"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fitness_reservation_lessons_trainer_id_fkey"
-            columns: ["trainer_id"]
+            foreignKeyName: "fitness_reservation_lessons_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "fitness_reservation_users"
             referencedColumns: ["id"]
