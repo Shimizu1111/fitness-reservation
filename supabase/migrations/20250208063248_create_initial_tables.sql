@@ -16,19 +16,11 @@ create table fitness_reservation_users (
     updated_at timestamp with time zone default now() -- 最終更新日時
 );
 
--- レッスン種類テーブル
-create table fitness_reservation_lesson_types (
-    id bigserial primary key, -- レッスン種類の一意なID（連番）
-    name text not null, -- レッスンの種類名（例: ヨガ, ピラティス, 筋トレなど）
-    created_at timestamp with time zone default now(), -- レッスン種類の登録日時
-    updated_at timestamp with time zone default now() -- 最終更新日時
-);
-
 -- レッスンテーブル
 create table fitness_reservation_lessons (
     id bigserial primary key, -- レッスンの一意なID（連番）
+    name text not null, -- レッスンの名前
     user_id uuid not null references fitness_reservation_users(id) on delete cascade, -- 担当トレーナーのID（外部キー）
-    lesson_type_id bigint not null references fitness_reservation_lesson_types(id) on delete cascade, -- レッスン種別のID（外部キー）
     scheduled_start_at timestamp with time zone not null, -- レッスン開始時間
     scheduled_end_at timestamp with time zone not null, -- レッスン終了時間
     max_participants smallint not null, -- 最大参加人数
@@ -66,9 +58,6 @@ create table fitness_reservation_notifications (
 
 -- ユーザーテーブルのRLS有効化
 ALTER TABLE fitness_reservation_users ENABLE ROW LEVEL SECURITY;
-
--- レッスン種類テーブルのRLS有効化
-ALTER TABLE fitness_reservation_lesson_types ENABLE ROW LEVEL SECURITY;
 
 -- レッスンテーブルのRLS有効化
 ALTER TABLE fitness_reservation_lessons ENABLE ROW LEVEL SECURITY;
@@ -109,18 +98,6 @@ WITH CHECK (
     auth.uid() IS NOT NULL AND 
     can_access_fitness_user(auth.uid(), id, role_id)
 );
-
--- レッスン種類の操作を制御するポリシー
-CREATE POLICY "レッスン種類の参照制御"
-ON fitness_reservation_lesson_types -- トレーナーと顧客は参照のみ
-FOR SELECT
-USING (true);
-
-CREATE POLICY "オーナーのレッスン種類管理" -- オーナーは全操作可能
-ON fitness_reservation_lesson_types
-FOR ALL
-USING ((SELECT role_id FROM fitness_reservation_users WHERE id = auth.uid()) = 1)
-WITH CHECK ((SELECT role_id FROM fitness_reservation_users WHERE id = auth.uid()) = 1);
 
 -- レッスンの操作を制御するポリシー
 CREATE POLICY "レッスンの参照制御" -- 全ユーザーがレッスンを参照可能

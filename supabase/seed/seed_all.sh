@@ -53,9 +53,6 @@ export PGPASSWORD=$SUPABASE_DB_PASSWORD
 echo "Inserting test users..."
 $PSQL_CMD -f $SQL_DIR/insert_test_users.sql
 
-echo "Inserting test lesson types..."
-$PSQL_CMD -f $SQL_DIR/insert_test_lesson_types.sql
-
 echo "Inserting test lessons..."
 $PSQL_CMD -f $SQL_DIR/insert_test_lessons.sql
 
