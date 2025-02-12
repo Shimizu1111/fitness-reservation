@@ -140,7 +140,7 @@ export default function AnalyticsPage() {
   const timeSlotChartData = analytics.trends.timeSlots[0].dates.map(
     (date, index) => {
       const data: any = { date };
-      analytics.trends.timeSlots.forEach((slot) => {
+      analytics.trends.timeSlots.forEach(slot => {
         data[slot.time] = slot.counts[index];
       });
       return data;
@@ -151,7 +151,7 @@ export default function AnalyticsPage() {
   const lessonTypeChartData = analytics.lessonTypeStats[0].dates.map(
     (date, index) => {
       const data: any = { date };
-      analytics.lessonTypeStats.forEach((lesson) => {
+      analytics.lessonTypeStats.forEach(lesson => {
         data[lesson.type] = lesson.monthly[index];
       });
       return data;

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { Card } from "@/components/ui/card";
-import { CalendarDays, ClipboardList, Settings } from "lucide-react";
-import { CustomerNav } from "./components/customer-nav";
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Card } from '@/components/ui/card';
+import { CalendarDays, ClipboardList, Settings } from 'lucide-react';
+import { CustomerNav } from './components/customer-nav';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 // 型定義
 interface NextLesson {
@@ -34,33 +34,37 @@ interface NotificationStatus {
 export default function CustomerDashboard() {
   // 状態管理
   const [nextLesson, setNextLesson] = useState<NextLesson | null>(null);
-  const [bookingHistory, setBookingHistory] = useState<BookingHistory>({ count: 0, recentBookings: [] });
-  const [notificationStatus, setNotificationStatus] = useState<NotificationStatus>({
-    email: true,
-    notifications: {
-      reservation: true,
-      cancellation: true,
-      waitingList: true,
-    }
+  const [bookingHistory, setBookingHistory] = useState<BookingHistory>({
+    count: 0,
+    recentBookings: [],
   });
+  const [notificationStatus, setNotificationStatus] =
+    useState<NotificationStatus>({
+      email: true,
+      notifications: {
+        reservation: true,
+        cancellation: true,
+        waitingList: true,
+      },
+    });
 
   // データ取得
   useEffect(() => {
     // TODO: APIからデータを取得する
     // 仮のデータをセット
     setNextLesson({
-      date: "2024年2月1日",
-      time: "10:00 - 11:00",
-      title: "ヨガ入門",
-      trainer: "山田先生"
+      date: '2024年2月1日',
+      time: '10:00 - 11:00',
+      title: 'ヨガ入門',
+      trainer: '山田先生',
     });
 
     setBookingHistory({
       count: 5,
       recentBookings: [
-        { date: "2024年1月25日", title: "ピラティス" },
-        { date: "2024年1月20日", title: "ヨガ入門" }
-      ]
+        { date: '2024年1月25日', title: 'ピラティス' },
+        { date: '2024年1月20日', title: 'ヨガ入門' },
+      ],
     });
   }, []);
 
@@ -76,7 +80,9 @@ export default function CustomerDashboard() {
               <div className="flex items-center gap-4">
                 <CalendarDays className="h-8 w-8 text-sky-500" />
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-800">次回のレッスン</h2>
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    次回のレッスン
+                  </h2>
                   {nextLesson ? (
                     <div className="text-gray-600">
                       <p className="font-medium">{nextLesson.title}</p>
@@ -98,13 +104,17 @@ export default function CustomerDashboard() {
               <div className="flex items-center gap-4">
                 <ClipboardList className="h-8 w-8 text-sky-500" />
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-800">予約履歴</h2>
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    予約履歴
+                  </h2>
                   {bookingHistory.count > 0 ? (
                     <div className="text-gray-600">
                       <p className="font-medium">全{bookingHistory.count}件</p>
                       <div className="text-sm mt-1">
                         {bookingHistory.recentBookings.map((booking, index) => (
-                          <p key={index}>{booking.date}: {booking.title}</p>
+                          <p key={index}>
+                            {booking.date}: {booking.title}
+                          </p>
                         ))}
                       </div>
                     </div>
@@ -122,11 +132,22 @@ export default function CustomerDashboard() {
               <div className="flex items-center gap-4">
                 <Settings className="h-8 w-8 text-sky-500" />
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-800">通知設定</h2>
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    通知設定
+                  </h2>
                   <div className="text-gray-600">
-                    <p>{notificationStatus.email ? "メール通知オン" : "メール通知オフ"}</p>
+                    <p>
+                      {notificationStatus.email
+                        ? 'メール通知オン'
+                        : 'メール通知オフ'}
+                    </p>
                     <p className="text-sm">
-                      {Object.values(notificationStatus.notifications).filter(Boolean).length}種類の通知が有効
+                      {
+                        Object.values(notificationStatus.notifications).filter(
+                          Boolean
+                        ).length
+                      }
+                      種類の通知が有効
                     </p>
                   </div>
                 </div>
@@ -137,4 +158,4 @@ export default function CustomerDashboard() {
       </main>
     </div>
   );
-} 
+}

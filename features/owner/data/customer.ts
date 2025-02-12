@@ -1,16 +1,19 @@
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/supabaseTypes';
-export type UserReservationSummary = Database['public']['Functions']['get_customers_for_owner']['Returns'][number];
+export type UserReservationSummary =
+  Database['public']['Functions']['get_customers_for_owner']['Returns'][number];
 
 // 会員一覧を取得
 export async function getCustomers() {
-  const { data: fetchedCustomers, error: userError } = await supabase.rpc('get_customers_for_owner');
+  const { data: fetchedCustomers, error: userError } = await supabase.rpc(
+    'get_customers_for_owner'
+  );
 
   if (userError) {
     console.error('会員データの取得に失敗しました:', userError);
     return { data: null, error: userError };
   }
-  
+
   return { data: fetchedCustomers, error: null };
 }
 
@@ -18,7 +21,8 @@ export async function getCustomers() {
 export async function getCustomerById(id: string) {
   const { data: fetchedCustomer, error: userError } = await supabase
     .from('fitness_reservation_users')
-    .select(`
+    .select(
+      `
       *,
       fitness_reservation_reservations(
         id,
@@ -27,18 +31,23 @@ export async function getCustomerById(id: string) {
         reserved_at,
         lesson_id
       )
-    `)
+    `
+    )
     .eq('id', id)
     .single();
 
   if (userError) return { data: null, userError };
-  if (!fetchedCustomer) return { data: null, error: new Error('会員が見つかりません') };
+  if (!fetchedCustomer)
+    return { data: null, error: new Error('会員が見つかりません') };
 
   return { data: fetchedCustomer, error: null };
 }
 
 // 会員のステータスを更新
-export async function updateCustomerStatus(id: string, status: Database['public']['Enums']['customer_status']) {
+export async function updateCustomerStatus(
+  id: string,
+  status: Database['public']['Enums']['customer_status']
+) {
   const { data, error } = await supabase
     .from('fitness_reservation_users')
     .update({ customer_status: status })
@@ -87,12 +96,12 @@ export async function createCustomer(customerData: {
 
     if (userError) throw userError;
     return { data: userData, error: null };
-    
   } catch (error) {
     console.error('会員登録エラー:', error);
-    return { 
-      data: null, 
-      error: error instanceof Error ? error : new Error('会員登録に失敗しました') 
+    return {
+      data: null,
+      error:
+        error instanceof Error ? error : new Error('会員登録に失敗しました'),
     };
   }
-} 
+}

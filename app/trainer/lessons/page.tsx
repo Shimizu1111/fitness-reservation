@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { TrainerNav } from "../components/trainer-nav";
-import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Users, Search } from "lucide-react";
-import { useState } from "react";
-import Link from "next/link";
+import { TrainerNav } from '../components/trainer-nav';
+import { Button } from '@/components/ui/button';
+import { Calendar, Clock, Users, Search } from 'lucide-react';
+import { useState } from 'react';
+import Link from 'next/link';
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
 interface Lesson {
   id: number;
@@ -25,92 +25,95 @@ interface Lesson {
     isFirstTime: boolean;
   }>;
   maxParticipants: number;
-  status: "upcoming" | "completed" | "cancelled";
+  status: 'upcoming' | 'completed' | 'cancelled';
 }
 
 export default function LessonsPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "upcoming" | "completed" | "cancelled">("all");
-  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<
+    'all' | 'upcoming' | 'completed' | 'cancelled'
+  >('all');
+
   // 仮のレッスンデータ
   const [lessons] = useState<Lesson[]>([
     {
       id: 1,
-      date: "2024年2月1日",
-      time: "10:00 - 11:00",
-      type: "ヨガ入門",
+      date: '2024年2月1日',
+      time: '10:00 - 11:00',
+      type: 'ヨガ入門',
       participants: [
-        { id: 1, name: "田中太郎", isFirstTime: false },
-        { id: 2, name: "鈴木花子", isFirstTime: true },
-        { id: 3, name: "山本次郎", isFirstTime: false }
+        { id: 1, name: '田中太郎', isFirstTime: false },
+        { id: 2, name: '鈴木花子', isFirstTime: true },
+        { id: 3, name: '山本次郎', isFirstTime: false },
       ],
       maxParticipants: 5,
-      status: "upcoming"
+      status: 'upcoming',
     },
     {
       id: 2,
-      date: "2024年2月1日",
-      time: "11:30 - 12:30",
-      type: "ピラティス",
+      date: '2024年2月1日',
+      time: '11:30 - 12:30',
+      type: 'ピラティス',
       participants: [
-        { id: 4, name: "佐藤美咲", isFirstTime: true },
-        { id: 5, name: "伊藤健一", isFirstTime: false }
+        { id: 4, name: '佐藤美咲', isFirstTime: true },
+        { id: 5, name: '伊藤健一', isFirstTime: false },
       ],
       maxParticipants: 5,
-      status: "upcoming"
+      status: 'upcoming',
     },
     {
       id: 3,
-      date: "2024年1月31日",
-      time: "10:00 - 11:00",
-      type: "ヨガ入門",
+      date: '2024年1月31日',
+      time: '10:00 - 11:00',
+      type: 'ヨガ入門',
       participants: [
-        { id: 6, name: "高橋和子", isFirstTime: false },
-        { id: 7, name: "渡辺隆", isFirstTime: true }
+        { id: 6, name: '高橋和子', isFirstTime: false },
+        { id: 7, name: '渡辺隆', isFirstTime: true },
       ],
       maxParticipants: 5,
-      status: "completed"
+      status: 'completed',
     },
     {
       id: 4,
-      date: "2024年1月31日",
-      time: "15:00 - 16:00",
-      type: "筋力トレーニング",
+      date: '2024年1月31日',
+      time: '15:00 - 16:00',
+      type: '筋力トレーニング',
       participants: [],
       maxParticipants: 5,
-      status: "cancelled"
-    }
+      status: 'cancelled',
+    },
   ]);
 
   // ステータスに応じたバッジのスタイルを返す
-  const getStatusBadgeStyle = (status: Lesson["status"]) => {
+  const getStatusBadgeStyle = (status: Lesson['status']) => {
     switch (status) {
-      case "upcoming":
-        return "bg-sky-100 text-sky-800";
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
+      case 'upcoming':
+        return 'bg-sky-100 text-sky-800';
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
     }
   };
 
   // ステータスの日本語表示
-  const getStatusText = (status: Lesson["status"]) => {
+  const getStatusText = (status: Lesson['status']) => {
     switch (status) {
-      case "upcoming":
-        return "予定";
-      case "completed":
-        return "完了";
-      case "cancelled":
-        return "キャンセル";
+      case 'upcoming':
+        return '予定';
+      case 'completed':
+        return '完了';
+      case 'cancelled':
+        return 'キャンセル';
     }
   };
 
   // フィルタリングされたレッスンリスト
-  const filteredLessons = lessons.filter(lesson =>
-    (statusFilter === "all" || lesson.status === statusFilter) &&
-    (lesson.type.includes(searchQuery) ||
-     lesson.participants.some(p => p.name.includes(searchQuery)))
+  const filteredLessons = lessons.filter(
+    lesson =>
+      (statusFilter === 'all' || lesson.status === statusFilter) &&
+      (lesson.type.includes(searchQuery) ||
+        lesson.participants.some(p => p.name.includes(searchQuery)))
   );
 
   return (
@@ -127,13 +130,15 @@ export default function LessonsPage() {
                 placeholder="レッスンを検索..."
                 className="pl-10 pr-4 py-2 border border-gray-200 rounded-md w-64"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
               />
             </div>
             <select
               className="px-4 py-2 border border-gray-200 rounded-md bg-white"
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+              onChange={e =>
+                setStatusFilter(e.target.value as typeof statusFilter)
+              }
             >
               <option value="all">すべてのステータス</option>
               <option value="upcoming">予定</option>
@@ -156,7 +161,7 @@ export default function LessonsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredLessons.map((lesson) => (
+              {filteredLessons.map(lesson => (
                 <TableRow key={lesson.id}>
                   <TableCell>{lesson.date}</TableCell>
                   <TableCell>{lesson.time}</TableCell>
@@ -164,7 +169,9 @@ export default function LessonsPage() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-gray-400" />
-                      <span>{lesson.participants.length}/{lesson.maxParticipants}名</span>
+                      <span>
+                        {lesson.participants.length}/{lesson.maxParticipants}名
+                      </span>
                       {lesson.participants.some(p => p.isFirstTime) && (
                         <span className="px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded-full">
                           初回あり
@@ -173,7 +180,9 @@ export default function LessonsPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeStyle(lesson.status)}`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeStyle(lesson.status)}`}
+                    >
                       {getStatusText(lesson.status)}
                     </span>
                   </TableCell>
@@ -188,7 +197,10 @@ export default function LessonsPage() {
               ))}
               {filteredLessons.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                  <TableCell
+                    colSpan={6}
+                    className="text-center py-8 text-gray-500"
+                  >
                     該当するレッスンはありません
                   </TableCell>
                 </TableRow>
@@ -199,4 +211,4 @@ export default function LessonsPage() {
       </main>
     </div>
   );
-} 
+}

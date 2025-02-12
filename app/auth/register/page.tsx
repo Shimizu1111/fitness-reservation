@@ -1,27 +1,27 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card } from '@/components/ui/card'
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
 
 export default function RegisterPage() {
-  const router = useRouter()
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     password: '',
-    role_id: 2 // デフォルトは一般会員
-  })
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+    role_id: 2, // デフォルトは一般会員
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
     try {
       const response = await fetch('/api/auth/register', {
@@ -30,22 +30,26 @@ export default function RegisterPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'ユーザー登録に失敗しました。')
+        throw new Error(data.error || 'ユーザー登録に失敗しました。');
       }
 
       // 登録成功時の処理
-      router.push('/auth/login?registered=true')
+      router.push('/auth/login?registered=true');
     } catch (error) {
-      setError(error instanceof Error ? error.message : '予期せぬエラーが発生しました。')
+      setError(
+        error instanceof Error
+          ? error.message
+          : '予期せぬエラーが発生しました。'
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -63,7 +67,10 @@ export default function RegisterPage() {
           )}
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
                 お名前
               </label>
               <Input
@@ -72,12 +79,17 @@ export default function RegisterPage() {
                 type="text"
                 required
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className="mt-1"
               />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 メールアドレス
               </label>
               <Input
@@ -86,12 +98,17 @@ export default function RegisterPage() {
                 type="email"
                 required
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 className="mt-1"
               />
             </div>
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="phone"
+                className="block text-sm font-medium text-gray-700"
+              >
                 電話番号
               </label>
               <Input
@@ -100,12 +117,17 @@ export default function RegisterPage() {
                 type="tel"
                 required
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
                 className="mt-1"
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 パスワード
               </label>
               <Input
@@ -114,23 +136,21 @@ export default function RegisterPage() {
                 type="password"
                 required
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
                 className="mt-1"
               />
             </div>
           </div>
 
           <div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading}
-            >
+            <Button type="submit" className="w-full" disabled={loading}>
               {loading ? '登録中...' : '登録する'}
             </Button>
           </div>
         </form>
       </Card>
     </div>
-  )
-} 
+  );
+}

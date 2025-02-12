@@ -23,7 +23,7 @@ export function TrainerNav() {
             </Link>
           </div>
           <nav className="flex items-center space-x-8">
-            {navigation.map((item) => {
+            {navigation.map(item => {
               const Icon = item.icon;
               return (
                 <Link

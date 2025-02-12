@@ -240,7 +240,7 @@ export default function CustomerDetailsPage({
               予約中のレッスン
             </h2>
             <div className="space-y-4">
-              {customerDetails.upcomingReservations.map((reservation) => (
+              {customerDetails.upcomingReservations.map(reservation => (
                 <div key={reservation.id} className="p-4 bg-gray-50 rounded-lg">
                   <div className="font-medium text-gray-900">
                     {reservation.lessonType}
@@ -267,7 +267,7 @@ export default function CustomerDetailsPage({
               受講履歴
             </h2>
             <div className="space-y-4">
-              {customerDetails.recentLessons.map((lesson) => (
+              {customerDetails.recentLessons.map(lesson => (
                 <div key={lesson.id} className="p-4 bg-gray-50 rounded-lg">
                   <div className="font-medium text-gray-900">
                     {lesson.lessonType}

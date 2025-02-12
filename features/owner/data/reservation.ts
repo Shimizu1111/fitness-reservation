@@ -1,15 +1,18 @@
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/supabaseTypes';
 
-type DbReservation = Database['public']['Tables']['fitness_reservation_reservations']['Row'];
-type DbLesson = Database['public']['Tables']['fitness_reservation_lessons']['Row'];
+type DbReservation =
+  Database['public']['Tables']['fitness_reservation_reservations']['Row'];
+type DbLesson =
+  Database['public']['Tables']['fitness_reservation_lessons']['Row'];
 type DbUser = Database['public']['Tables']['fitness_reservation_users']['Row'];
 
 // 予約一覧を取得
 export async function getReservations() {
   const { data, error } = await supabase
     .from('fitness_reservation_reservations')
-    .select(`
+    .select(
+      `
       *,
       lesson:fitness_reservation_lessons(
         id,
@@ -27,7 +30,8 @@ export async function getReservations() {
         email,
         phone
       )
-    `)
+    `
+    )
     .order('reserved_at', { ascending: false });
 
   if (error) {
@@ -35,7 +39,7 @@ export async function getReservations() {
     return { data: null, error };
   }
 
-//   const reservations = data.map(convertToReservation);
+  //   const reservations = data.map(convertToReservation);
   const reservations = convertToReservation(data);
   return { data: reservations, error: null };
 }
@@ -49,7 +53,8 @@ export async function cancelReservation(id: number) {
       cancelled_at: new Date().toISOString(),
     })
     .eq('id', id)
-    .select(`
+    .select(
+      `
       *,
       lesson:fitness_reservation_lessons(
         id,
@@ -67,7 +72,8 @@ export async function cancelReservation(id: number) {
         email,
         phone
       )
-    `)
+    `
+    )
     .single();
 
   if (error) {
@@ -84,7 +90,8 @@ export async function updateReservationStatus(id: number, status: number) {
     .from('fitness_reservation_reservations')
     .update({ status })
     .eq('id', id)
-    .select(`
+    .select(
+      `
       *,
       lesson:fitness_reservation_lessons(
         id,
@@ -102,7 +109,8 @@ export async function updateReservationStatus(id: number, status: number) {
         email,
         phone
       )
-    `)
+    `
+    )
     .single();
 
   if (error) {
@@ -117,7 +125,8 @@ export async function updateReservationStatus(id: number, status: number) {
 export async function getReservationsByDate(date: string) {
   const { data, error } = await supabase
     .from('fitness_reservation_reservations')
-    .select(`
+    .select(
+      `
       *,
       lesson:fitness_reservation_lessons(
         id,
@@ -135,7 +144,8 @@ export async function getReservationsByDate(date: string) {
         email,
         phone
       )
-    `)
+    `
+    )
     .eq('lesson.scheduled_start_at::date', date)
     .order('lesson.scheduled_start_at', { ascending: true });
 
@@ -152,7 +162,8 @@ export async function getReservationsByDate(date: string) {
 export async function getReservationsByStatus(status: number) {
   const { data, error } = await supabase
     .from('fitness_reservation_reservations')
-    .select(`
+    .select(
+      `
       *,
       lesson:fitness_reservation_lessons(
         id,
@@ -170,7 +181,8 @@ export async function getReservationsByStatus(status: number) {
         email,
         phone
       )
-    `)
+    `
+    )
     .eq('status', status)
     .order('reserved_at', { ascending: false });
 

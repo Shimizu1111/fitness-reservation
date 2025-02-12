@@ -58,7 +58,7 @@ export default function LessonsPage() {
     }
   };
 
-  const filteredLessons = lessons.filter((lesson) => {
+  const filteredLessons = lessons.filter(lesson => {
     const lessonData =
       (statusFilter === 'all' ||
         lesson.status === LessonStatus[statusFilter]) &&
@@ -82,13 +82,13 @@ export default function LessonsPage() {
                 placeholder="レッスンを検索..."
                 className="pl-10 pr-4 py-2 border border-gray-200 rounded-md w-64"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
               />
             </div>
             <select
               className="px-4 py-2 border border-gray-200 rounded-md bg-white"
               value={statusFilter}
-              onChange={(e) =>
+              onChange={e =>
                 setStatusFilter(e.target.value as typeof statusFilter)
               }
             >
@@ -124,7 +124,7 @@ export default function LessonsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredLessons.map((lesson) => (
+              {filteredLessons.map(lesson => (
                 <TableRow key={lesson.id}>
                   <TableCell>
                     <div className="flex flex-col">

@@ -58,7 +58,7 @@ export function CustomerList() {
   // フィルタリングとソート
   const filteredAndSortedCustomers = customers
     .filter(
-      (customer) =>
+      customer =>
         (filters.statusFilter === 'all' ||
           customer.customer_status === filters.statusFilter) &&
         (customer.name.includes(filters.searchQuery) ||
@@ -78,7 +78,7 @@ export function CustomerList() {
 
   // ソートの切り替え
   const toggleSort = (field: keyof Customers[number]) => {
-    setFilters((prev) => ({
+    setFilters(prev => ({
       ...prev,
       sortField: field,
       sortOrder:
@@ -97,16 +97,16 @@ export function CustomerList() {
               placeholder="会員を検索..."
               className="pl-10 pr-4 py-2 border border-gray-200 rounded-md w-64"
               value={filters.searchQuery}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, searchQuery: e.target.value }))
+              onChange={e =>
+                setFilters(prev => ({ ...prev, searchQuery: e.target.value }))
               }
             />
           </div>
           <select
             className="px-4 py-2 border border-gray-200 rounded-md bg-white"
             value={filters.statusFilter}
-            onChange={(e) =>
-              setFilters((prev) => ({
+            onChange={e =>
+              setFilters(prev => ({
                 ...prev,
                 statusFilter: e.target.value as
                   | 'all'
@@ -190,7 +190,7 @@ export function CustomerList() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredAndSortedCustomers.map((customer) => (
+              {filteredAndSortedCustomers.map(customer => (
                 <tr key={customer.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="font-medium text-gray-900">

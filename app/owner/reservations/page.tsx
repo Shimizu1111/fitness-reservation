@@ -87,8 +87,7 @@ export default function ReservationsPage() {
 
   // フィルタリングされた予約リスト
   const filteredReservations = reservations.filter(
-    (reservation) =>
-      statusFilter === 'all' || reservation.status === statusFilter
+    reservation => statusFilter === 'all' || reservation.status === statusFilter
   );
 
   return (
@@ -132,7 +131,7 @@ export default function ReservationsPage() {
         </div>
 
         <div className="space-y-4">
-          {filteredReservations.map((reservation) => (
+          {filteredReservations.map(reservation => (
             <Card key={reservation.id} className="p-6">
               <div className="flex justify-between items-start">
                 <div className="space-y-4">

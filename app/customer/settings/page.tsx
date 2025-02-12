@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { CustomerNav } from "../components/customer-nav";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Bell, Mail } from "lucide-react";
-import { useState } from "react";
+import { CustomerNav } from '../components/customer-nav';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Bell, Mail } from 'lucide-react';
+import { useState } from 'react';
 
 // 通知設定の型定義
 interface NotificationSettings {
@@ -25,7 +25,7 @@ export default function SettingsPage() {
       reservation: true,
       cancellation: true,
       waitingList: true,
-    }
+    },
   });
 
   // 設定を保存する関数
@@ -41,13 +41,16 @@ export default function SettingsPage() {
   };
 
   // 通知設定を更新する関数
-  const updateNotificationSetting = (key: keyof NotificationSettings['notifications'], value: boolean) => {
+  const updateNotificationSetting = (
+    key: keyof NotificationSettings['notifications'],
+    value: boolean
+  ) => {
     setSettings(prev => ({
       ...prev,
       notifications: {
         ...prev.notifications,
-        [key]: value
-      }
+        [key]: value,
+      },
     }));
   };
 
@@ -67,11 +70,15 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between py-3">
               <div>
                 <div className="font-medium text-gray-800">メール通知</div>
-                <div className="text-sm text-gray-500">予約関連の通知をメールで受け取ります</div>
+                <div className="text-sm text-gray-500">
+                  予約関連の通知をメールで受け取ります
+                </div>
               </div>
               <Switch
                 checked={settings.email}
-                onCheckedChange={(checked: boolean) => setSettings(prev => ({ ...prev, email: checked }))}
+                onCheckedChange={(checked: boolean) =>
+                  setSettings(prev => ({ ...prev, email: checked }))
+                }
               />
             </div>
           </Card>
@@ -86,31 +93,47 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between py-3 border-b">
                 <div>
                   <div className="font-medium text-gray-800">予約確定通知</div>
-                  <div className="text-sm text-gray-500">レッスンの予約が確定した際に通知を受け取ります</div>
+                  <div className="text-sm text-gray-500">
+                    レッスンの予約が確定した際に通知を受け取ります
+                  </div>
                 </div>
                 <Switch
                   checked={settings.notifications.reservation}
-                  onCheckedChange={(checked: boolean) => updateNotificationSetting('reservation', checked)}
+                  onCheckedChange={(checked: boolean) =>
+                    updateNotificationSetting('reservation', checked)
+                  }
                 />
               </div>
               <div className="flex items-center justify-between py-3 border-b">
                 <div>
-                  <div className="font-medium text-gray-800">キャンセル通知</div>
-                  <div className="text-sm text-gray-500">予約がキャンセルされた際に通知を受け取ります</div>
+                  <div className="font-medium text-gray-800">
+                    キャンセル通知
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    予約がキャンセルされた際に通知を受け取ります
+                  </div>
                 </div>
                 <Switch
                   checked={settings.notifications.cancellation}
-                  onCheckedChange={(checked: boolean) => updateNotificationSetting('cancellation', checked)}
+                  onCheckedChange={(checked: boolean) =>
+                    updateNotificationSetting('cancellation', checked)
+                  }
                 />
               </div>
               <div className="flex items-center justify-between py-3">
                 <div>
-                  <div className="font-medium text-gray-800">キャンセル待ち通知</div>
-                  <div className="text-sm text-gray-500">キャンセル待ちの順番が回ってきた際に通知を受け取ります</div>
+                  <div className="font-medium text-gray-800">
+                    キャンセル待ち通知
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    キャンセル待ちの順番が回ってきた際に通知を受け取ります
+                  </div>
                 </div>
                 <Switch
                   checked={settings.notifications.waitingList}
-                  onCheckedChange={(checked: boolean) => updateNotificationSetting('waitingList', checked)}
+                  onCheckedChange={(checked: boolean) =>
+                    updateNotificationSetting('waitingList', checked)
+                  }
                 />
               </div>
             </div>
@@ -118,7 +141,10 @@ export default function SettingsPage() {
 
           {/* 保存ボタン */}
           <div className="flex justify-end">
-            <Button className="bg-sky-500 hover:bg-sky-600" onClick={saveSettings}>
+            <Button
+              className="bg-sky-500 hover:bg-sky-600"
+              onClick={saveSettings}
+            >
               設定を保存
             </Button>
           </div>
@@ -126,4 +152,4 @@ export default function SettingsPage() {
       </main>
     </div>
   );
-} 
+}

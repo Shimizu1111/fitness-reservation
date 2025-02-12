@@ -1,5 +1,11 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Dumbbell } from 'lucide-react';
 import Link from 'next/link';
 
@@ -17,12 +23,14 @@ export default function Home() {
           <p className="mb-8 text-xl text-gray-600">
             簡単な操作で、レッスンの予約・管理ができます
           </p>
-          
+
           <div className="grid gap-6 md:grid-cols-3">
             <Card className="bg-white hover:shadow-lg transition-shadow border border-gray-100">
               <CardHeader>
                 <CardTitle className="text-gray-800">会員の方</CardTitle>
-                <CardDescription className="text-gray-600">レッスンの予約・管理</CardDescription>
+                <CardDescription className="text-gray-600">
+                  レッスンの予約・管理
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button className="w-full bg-sky-500 hover:bg-sky-600" asChild>
@@ -34,7 +42,9 @@ export default function Home() {
             <Card className="bg-white hover:shadow-lg transition-shadow border border-gray-100">
               <CardHeader>
                 <CardTitle className="text-gray-800">オーナー</CardTitle>
-                <CardDescription className="text-gray-600">予約状況・会員管理</CardDescription>
+                <CardDescription className="text-gray-600">
+                  予約状況・会員管理
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button className="w-full bg-sky-500 hover:bg-sky-600" asChild>
@@ -46,7 +56,9 @@ export default function Home() {
             <Card className="bg-white hover:shadow-lg transition-shadow border border-gray-100">
               <CardHeader>
                 <CardTitle className="text-gray-800">トレーナー</CardTitle>
-                <CardDescription className="text-gray-600">レッスン・参加者確認</CardDescription>
+                <CardDescription className="text-gray-600">
+                  レッスン・参加者確認
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button className="w-full bg-sky-500 hover:bg-sky-600" asChild>
