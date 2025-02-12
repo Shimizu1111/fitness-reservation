@@ -15,6 +15,37 @@ export async function getLessons() {
   return { data: fetchedLessons, error: lessonError };
 }
 
+export const getLessonById = async (id: string) => {
+  const { data: lesson, error: lessonError } = await supabase
+    .from('fitness_reservation_lessons')
+    .select(`
+      *,
+      user:fitness_reservation_users!user_id (
+        id,
+        name,
+        email
+      ),
+      reservations:fitness_reservation_reservations (
+        id,
+        status,
+        user:fitness_reservation_users (
+          id,
+          name,
+          email,
+          phone
+        )
+      )
+    `)
+    .eq('id', parseInt(id))
+    .single();
+
+  if (lessonError) {
+    return { error: lessonError };
+  }
+
+  return { data: lesson };
+};
+
 export async function updateLessonStatus(id: number, status: LessonStatusType) {
   const { data, error } = await supabase
     .from('fitness_reservation_lessons')

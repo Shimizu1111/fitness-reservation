@@ -172,7 +172,12 @@ export default function LessonsPage() {
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="outline" size="sm" className="mr-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mr-2"
+                      onClick={() => router.push(`/owner/lessons/${lesson.id}`)}
+                    >
                       詳細
                     </Button>
                     <Button
