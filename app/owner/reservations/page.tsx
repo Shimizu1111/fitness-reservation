@@ -155,7 +155,7 @@ export default function ReservationsPage() {
                       <span>
                         受講者: 
                         <Link 
-                          href={`/owner/members/${reservation.customerId}`}
+                          href={`/owner/customers/${reservation.customerId}`}
                           className="text-sky-600 hover:text-sky-700 hover:underline ml-1"
                         >
                           {reservation.customerName}

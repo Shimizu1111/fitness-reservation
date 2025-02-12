@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getMembers, updateMemberStatus } from '../data/member';
-import type { Member, MemberFilters } from '../types/member';
-import { getMemberStatusString, MemberStatus } from '../constants/member';
+import { getCustomers, updateCustomerStatus } from '../data/customer';
+import type { Customer, CustomerFilters } from '../types/customer';
+import { getCustomerStatusString, CustomerStatus } from '../constants/customer';
 
-export function MemberList() {
+export function CustomerList() {
   const router = useRouter();
-  const [members, setMembers] = useState<Member[]>([]);
-  const [filters, setFilters] = useState<MemberFilters>({
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [filters, setFilters] = useState<CustomerFilters>({
     searchQuery: '',
     statusFilter: 'all',
     sortField: 'name',
@@ -17,44 +17,44 @@ export function MemberList() {
   });
 
   useEffect(() => {
-    const fetchMembers = async () => {
-      const { data, error } = await getMembers();
+    const fetchCustomers = async () => {
+      const { data, error } = await getCustomers();
       if (error) {
         console.error('会員データの取得に失敗しました:', error);
       } else if (data) {
-        setMembers(data);
+        setCustomers(data);
       }
     };
 
-    fetchMembers();
+    fetchCustomers();
   }, []);
 
   // 詳細画面への遷移
-  const handleViewDetails = (memberId: string) => {
-    router.push(`/owner/members/${memberId}`);
+  const handleViewDetails = (customerId: string) => {
+    router.push(`/owner/customers/${customerId}`);
   };
 
   // ステータス変更の処理
-  const handleStatusChange = async (memberId: string, newStatus: 'active' | 'inactive') => {
+  const handleStatusChange = async (customerId: string, newStatus: 'active' | 'inactive') => {
     try {
-      const { error } = await updateMemberStatus(memberId, newStatus);
+      const { error } = await updateCustomerStatus(customerId, newStatus);
       if (error) throw error;
       
       // 成功したら会員一覧を再取得
-      const { data } = await getMembers();
-      if (data) setMembers(data);
+      const { data } = await getCustomers();
+      if (data) setCustomers(data);
     } catch (error) {
       console.error('ステータスの更新に失敗しました:', error);
     }
   };
 
   // フィルタリングとソート
-  const filteredAndSortedMembers = members
-    .filter(member =>
-      (filters.statusFilter === 'all' || member.status === filters.statusFilter) &&
-      (member.name.includes(filters.searchQuery) ||
-       member.email.includes(filters.searchQuery) ||
-       member.phone.includes(filters.searchQuery))
+  const filteredAndSortedCustomers = customers
+    .filter(customer =>
+      (filters.statusFilter === 'all' || customer.status === filters.statusFilter) &&
+      (customer.name.includes(filters.searchQuery) ||
+       customer.email.includes(filters.searchQuery) ||
+       customer.phone.includes(filters.searchQuery))
     )
     .sort((a, b) => {
       const aValue = a[filters.sortField];
@@ -68,7 +68,7 @@ export function MemberList() {
     });
 
   // ソートの切り替え
-  const toggleSort = (field: keyof Member) => {
+  const toggleSort = (field: keyof Customer) => {
     setFilters(prev => ({
       ...prev,
       sortField: field,
@@ -105,7 +105,7 @@ export function MemberList() {
         </div>
         <Button 
           className="bg-sky-500 hover:bg-sky-600"
-          onClick={() => router.push('/owner/members/create')}
+          onClick={() => router.push('/owner/customers/create')}
         >
           新規会員登録
         </Button>
@@ -149,40 +149,40 @@ export function MemberList() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredAndSortedMembers.map((member) => (
-                <tr key={member.id} className="hover:bg-gray-50">
+              {filteredAndSortedCustomers.map((customer) => (
+                <tr key={customer.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="font-medium text-gray-900">{member.name}</div>
+                    <div className="font-medium text-gray-900">{customer.name}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                    {member.email}
+                    {customer.email}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                    {member.phone}
+                    {customer.phone}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                    {member.joinDate}
+                    {customer.joinDate}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                    {member.totalLessons}回
+                    {customer.totalLessons}回
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                    {member.lastLesson || '未受講'}
+                    {customer.lastLesson || '未受講'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      member.status === MemberStatus.ACTIVE
+                      customer.status === CustomerStatus.ACTIVE
                         ? 'bg-green-100 text-green-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {getMemberStatusString(member.status)}
+                      {getCustomerStatusString(customer.status)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Button 
                       variant="ghost" 
                       className="text-sky-600 hover:text-sky-900"
-                      onClick={() => handleViewDetails(member.id)}
+                      onClick={() => handleViewDetails(customer.id)}
                     >
                       詳細
                     </Button>
@@ -190,11 +190,11 @@ export function MemberList() {
                       variant="ghost" 
                       className="text-red-600 hover:text-red-900 ml-2"
                       onClick={() => handleStatusChange(
-                        member.id,
-                        member.status === MemberStatus.ACTIVE ? 'inactive' : 'active'
+                        customer.id,
+                        customer.status === CustomerStatus.ACTIVE ? 'inactive' : 'active'
                       )}
                     >
-                      {member.status === MemberStatus.ACTIVE ? '利用停止' : '再開'}
+                      {customer.status === CustomerStatus.ACTIVE ? '利用停止' : '再開'}
                     </Button>
                   </td>
                 </tr>

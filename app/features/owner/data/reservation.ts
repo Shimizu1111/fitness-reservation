@@ -5,8 +5,8 @@ import { ReservationStatus, ReservationStatusType } from '../constants/reservati
 import { Lesson } from '../types/lesson';
 import { User } from '@supabase/supabase-js';
 import { LessonLocationType, LessonStatusType } from '../constants/lesson';
-import { Member } from '../types/member';
-import { MemberStatusType } from '../constants/member';
+import { Customer } from '../types/customer';
+import { CustomerStatusType } from '../constants/customer';
 
 type DbReservation = Database['public']['Tables']['fitness_reservation_reservations']['Row'];
 type DbLesson = Database['public']['Tables']['fitness_reservation_lessons']['Row'];
@@ -19,7 +19,7 @@ function convertToReservation(
 //   dbUser: DbUser
 ): Reservation & {
 //   lesson: Lesson;
-//   member: Member;
+//   customer: Customer;
 } {
   return {
     id: dbReservation.id,
@@ -44,7 +44,7 @@ function convertToReservation(
       createdAt: dbReservation.lesson.created_at,
       updatedAt: dbReservation.lesson.updated_at,
     },
-    member: {
+    customer: {
       id: dbUser.id,
       roleId: dbUser.role_id,
       name: dbUser.name,
@@ -52,7 +52,7 @@ function convertToReservation(
       email: dbUser.email,
       phone: dbUser.phone,
       address: dbUser.address,
-      status: dbUser.status as MemberStatusType,
+      status: dbUser.status as CustomerStatusType,
       cancellationReason: dbUser.cancellation_reason,
       joinDate: dbUser.join_date,
       totalLessons: null,

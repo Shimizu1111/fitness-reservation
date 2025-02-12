@@ -3,15 +3,15 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { createMember } from '../data/member';
-import type { MemberFormData } from '../types/member';
+import { createCustomer } from '../data/customer';
+import type { CustomerFormData } from '../types/customer';
 import { generateSecurePassword } from '@/lib/utils/password';
 import { toast } from '@/hooks/use-toast';
 
-export function MemberForm() {
+export function CustomerForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<MemberFormData>({
+  const [formData, setFormData] = useState<CustomerFormData>({
     name: '',
     email: '',
     phone: '',
@@ -32,7 +32,7 @@ export function MemberForm() {
       // セキュアなパスワードを生成
       const password = generateSecurePassword();
 
-      const { data, error } = await createMember({
+      const { data, error } = await createCustomer({
         ...formData,
         password,
       });
@@ -50,7 +50,7 @@ export function MemberForm() {
         ),
       });
 
-      router.push('/owner/members');
+      router.push('/owner/customers');
     } catch (error) {
       console.error('Error:', error);
       toast({

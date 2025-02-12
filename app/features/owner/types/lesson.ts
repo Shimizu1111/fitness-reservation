@@ -1,10 +1,10 @@
 import { LessonLocationType, LessonStatusType } from "../constants/lesson";
-import { Member } from "./member";
+import { Customer } from "./customer";
 
 export interface Lesson {
   id: number;
   name: string;
-  trainer: Member;
+  trainer: Customer;
   scheduledStartAt: string;
   scheduledEndAt: string;
   maxParticipants: number;

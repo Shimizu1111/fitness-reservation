@@ -20,13 +20,13 @@ import {
 
 interface AnalyticsData {
   currentStats: {
-    totalMembers: number;
-    activeMembers: number;
+    totalCustomers: number;
+    activeCustomers: number;
     totalLessons: number;
     averageAttendance: number;
   };
   trends: {
-    members: Array<{
+    customers: Array<{
       date: string;
       total: number;
       active: number;
@@ -56,13 +56,13 @@ export default function AnalyticsPage() {
   // 仮の分析データ
   const [analytics] = useState<AnalyticsData>({
     currentStats: {
-      totalMembers: 150,
-      activeMembers: 120,
+      totalCustomers: 150,
+      activeCustomers: 120,
       totalLessons: 450,
       averageAttendance: 85
     },
     trends: {
-      members: [
+      customers: [
         { date: "2023-12", total: 130, active: 100 },
         { date: "2024-01", total: 150, active: 120 }
       ],
@@ -117,9 +117,9 @@ export default function AnalyticsPage() {
   };
 
   // 会員数の成長率
-  const memberGrowth = calculateGrowth(
-    analytics.trends.members[1].total,
-    analytics.trends.members[0].total
+  const customerGrowth = calculateGrowth(
+    analytics.trends.customers[1].total,
+    analytics.trends.customers[0].total
   );
 
   // レッスン数の成長率
@@ -179,31 +179,31 @@ export default function AnalyticsPage() {
           <div className="relative">
             <Card 
               className="p-6 cursor-pointer"
-              onClick={() => setExpandedCard(expandedCard === 'members' ? null : 'members')}
+              onClick={() => setExpandedCard(expandedCard === 'customers' ? null : 'customers')}
             >
               <div className="flex items-center gap-4">
                 <Users className="h-8 w-8 text-sky-500" />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <h2 className="text-sm font-medium text-gray-500">総会員数</h2>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${expandedCard === 'members' ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`h-4 w-4 transition-transform ${expandedCard === 'customers' ? 'rotate-180' : ''}`} />
                   </div>
                   <div className="flex items-center gap-2">
-                    <p className="text-2xl font-bold text-gray-800">{analytics.currentStats.totalMembers}名</p>
-                    <div className={`flex items-center text-sm ${memberGrowth.isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                      {memberGrowth.isPositive ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
-                      {memberGrowth.value}%
+                    <p className="text-2xl font-bold text-gray-800">{analytics.currentStats.totalCustomers}名</p>
+                    <div className={`flex items-center text-sm ${customerGrowth.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                      {customerGrowth.isPositive ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+                      {customerGrowth.value}%
                     </div>
                   </div>
-                  <p className="text-sm text-gray-500">アクティブ: {analytics.currentStats.activeMembers}名</p>
+                  <p className="text-sm text-gray-500">アクティブ: {analytics.currentStats.activeCustomers}名</p>
                 </div>
               </div>
             </Card>
-            {expandedCard === 'members' && (
+            {expandedCard === 'customers' && (
               <Card className="absolute top-full left-0 right-0 mt-2 p-6 z-10">
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={analytics.trends.members}>
+                    <LineChart data={analytics.trends.customers}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" />
                       <YAxis />
@@ -383,7 +383,7 @@ export default function AnalyticsPage() {
             <h2 className="text-xl font-semibold text-gray-800 mb-6">会員数・出席率推移</h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={analytics.trends.members}>
+                <LineChart data={analytics.trends.customers}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
                   <YAxis yAxisId="left" />
