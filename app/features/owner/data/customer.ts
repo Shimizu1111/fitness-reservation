@@ -1,10 +1,5 @@
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/types';
-import type { Customer, CustomerStatusType } from '../types/customer';
-import { getCustomerStatusString } from '../constants/customer';
-
-type User = Database['public']['Tables']['fitness_reservation_users']['Row'];
-
 export type UserReservationSummary = Database['public']['Functions']['get_customers_for_owner']['Returns'][number];
 
 // 会員一覧を取得
@@ -15,30 +10,13 @@ export async function getCustomers() {
     console.error('会員データの取得に失敗しました:', userError);
     return { data: null, error: userError };
   }
-
-  const customers: Customer[] = fetchedCustomers?.map(customer => ({
-    id: customer.id,
-    name: customer.name,
-    roleId: customer.role_id,
-    password: null,
-    email: customer.email,
-    phone: customer.phone,
-    address: customer.address,
-    joinDate: customer.join_date,
-    totalLessons: customer.reservation_count,
-    lastLesson: customer.latest_reserved_at,
-    status: customer.status as CustomerStatusType,
-    cancellationReason: customer.cancellation_reason,
-    createdAt: null,
-    updatedAt: null,
-  })) || [];
   
-  return { data: customers, error: null };
+  return { data: fetchedCustomers, error: null };
 }
 
 // 会員詳細を取得
 export async function getCustomerById(id: string) {
-  const { data, error } = await supabase
+  const { data: fetchedCustomer, error: userError } = await supabase
     .from('fitness_reservation_users')
     .select(`
       *,
@@ -53,17 +31,17 @@ export async function getCustomerById(id: string) {
     .eq('id', id)
     .single();
 
-  if (error) return { data: null, error };
-  if (!data) return { data: null, error: new Error('会員が見つかりません') };
+  if (userError) return { data: null, userError };
+  if (!fetchedCustomer) return { data: null, error: new Error('会員が見つかりません') };
 
-  return { data: convertToCustomer(data), error: null };
+  return { data: fetchedCustomer, error: null };
 }
 
 // 会員のステータスを更新
-export async function updateCustomerStatus(id: string, status: CustomerStatusType) {
+export async function updateCustomerStatus(id: string, status: Database['public']['Enums']['customer_status']) {
   const { data, error } = await supabase
     .from('fitness_reservation_users')
-    .update({ status })
+    .update({ customer_status: status })
     .eq('id', id)
     .select()
     .single();
@@ -71,22 +49,7 @@ export async function updateCustomerStatus(id: string, status: CustomerStatusTyp
   if (error) return { data: null, error };
   if (!data) return { data: null, error: new Error('会員が見つかりません') };
 
-  const customer: Customer = {
-    id: data.id,
-    name: data.name,
-    email: data.email,
-    phone: data.phone,
-    address: data.address,
-    joinDate: data.join_date,
-    totalLessons: 0,
-    lastLesson: null,
-    status: data.status as CustomerStatusType,
-    cancellationReason: data.cancellation_reason,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
-  };
-
-  return { data: customer, error: null };
+  return { data: null, error: null };
 }
 
 // 新規会員を登録
@@ -123,7 +86,7 @@ export async function createCustomer(customerData: {
       .single();
 
     if (userError) throw userError;
-    return { data: convertToCustomer(userData), error: null };
+    return { data: userData, error: null };
     
   } catch (error) {
     console.error('会員登録エラー:', error);

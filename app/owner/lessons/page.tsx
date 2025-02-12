@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { OwnerNav } from "../components/owner-nav";
-import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Users, Search } from "lucide-react";
+import { OwnerNav } from '../components/owner-nav';
+import { Button } from '@/components/ui/button';
+import { Users, Search } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -11,17 +11,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { getLessons, updateLessonStatus } from '@/app/features/owner/data/lesson';
-import { LessonStatus, DatabaseLessonStatusType } from '@/app/features/owner/constants/lesson';
-import type { Lesson } from '@/app/features/owner/types/lesson';
+} from '@/components/ui/table';
+import { getLessons } from '@/app/features/owner/data/lesson';
+import {
+  LessonStatus,
+  LessonStatusType,
+} from '@/app/features/owner/constants/lesson';
 import { Database } from '@/lib/supabase/types';
-
+import { useRouter } from 'next/navigation';
 export default function LessonsPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | keyof typeof LessonStatus>("all");
-  const [lessons, setLessons] = useState<Database['public']['Functions']['get_lessons_for_owner']['Returns']>([]);
-  
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<
+    'all' | keyof typeof LessonStatus
+  >('all');
+  const [lessons, setLessons] = useState<
+    Database['public']['Functions']['get_lessons_for_owner']['Returns']
+  >([]);
+
   useEffect(() => {
     const fetchLessons = async () => {
       const { data: fetchedLessons, error } = await getLessons();
@@ -36,27 +43,28 @@ export default function LessonsPage() {
   }, []);
 
   // ステータスに応じたバッジのスタイルを返す
-  const getStatusBadgeStyle = (status: DatabaseLessonStatusType) => {
+  const getStatusBadgeStyle = (status: LessonStatusType) => {
     switch (status) {
-      // case LessonStatus.SCHEDULED:
       case LessonStatus.SCHEDULED:
-        return "bg-sky-100 text-sky-800";
+        return 'bg-sky-100 text-sky-800';
       case LessonStatus.IN_PROGRESS:
-        return "bg-green-100 text-green-800";
+        return 'bg-green-100 text-green-800';
       case LessonStatus.COMPLETED:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800';
       case LessonStatus.CANCELLED:
-        return "bg-red-100 text-red-800";
+        return 'bg-red-100 text-red-800';
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const filteredLessons = lessons.filter(lesson => {
-    const lessonData = (statusFilter === "all" || lesson.status === LessonStatus[statusFilter]) &&
+  const filteredLessons = lessons.filter((lesson) => {
+    const lessonData =
+      (statusFilter === 'all' ||
+        lesson.status === LessonStatus[statusFilter]) &&
       (lesson.name.includes(searchQuery) ||
-      lesson.user_name.includes(searchQuery) ||
-      lesson.location.includes(searchQuery))
+        lesson.user_name.includes(searchQuery) ||
+        lesson.location.includes(searchQuery));
     return lessonData;
   });
 
@@ -80,7 +88,9 @@ export default function LessonsPage() {
             <select
               className="px-4 py-2 border border-gray-200 rounded-md bg-white"
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+              onChange={(e) =>
+                setStatusFilter(e.target.value as typeof statusFilter)
+              }
             >
               <option value="all">すべてのステータス</option>
               {Object.entries(LessonStatus).map(([key, value]) => (
@@ -89,9 +99,11 @@ export default function LessonsPage() {
                 </option>
               ))}
             </select>
-            <Button 
+            <Button
               className="bg-sky-500 hover:bg-sky-600"
-              onClick={() => {/* レッスン作成画面へ遷移 */}}
+              onClick={() => {
+                router.push('/owner/lessons/create');
+              }}
             >
               新規レッスン作成
             </Button>
@@ -116,10 +128,21 @@ export default function LessonsPage() {
                 <TableRow key={lesson.id}>
                   <TableCell>
                     <div className="flex flex-col">
-                      <span>{new Date(lesson.scheduled_start_at).toLocaleDateString('ja-JP')}</span>
+                      <span>
+                        {new Date(lesson.scheduled_start_at).toLocaleDateString(
+                          'ja-JP'
+                        )}
+                      </span>
                       <span className="text-sm text-gray-500">
-                        {new Date(lesson.scheduled_start_at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} - 
-                        {new Date(lesson.scheduled_end_at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(lesson.scheduled_start_at).toLocaleTimeString(
+                          'ja-JP',
+                          { hour: '2-digit', minute: '2-digit' }
+                        )}{' '}
+                        -
+                        {new Date(lesson.scheduled_end_at).toLocaleTimeString(
+                          'ja-JP',
+                          { hour: '2-digit', minute: '2-digit' }
+                        )}
                       </span>
                     </div>
                   </TableCell>
@@ -140,7 +163,11 @@ export default function LessonsPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeStyle(lesson.status)}`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeStyle(
+                        lesson.status
+                      )}`}
+                    >
                       {lesson.status}
                     </span>
                   </TableCell>
@@ -148,7 +175,11 @@ export default function LessonsPage() {
                     <Button variant="outline" size="sm" className="mr-2">
                       詳細
                     </Button>
-                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700"
+                    >
                       キャンセル
                     </Button>
                   </TableCell>

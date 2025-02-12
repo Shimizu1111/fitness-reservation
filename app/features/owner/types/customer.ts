@@ -1,22 +1,4 @@
-import { CustomerStatus } from "../constants/customer";
-
-export type CustomerStatusType = typeof CustomerStatus[keyof typeof CustomerStatus];
-export type CustomerStatusStringType = string;
-
-export interface Customer {
-  id: string;
-  roleId: number;
-  name: string;
-  password: string | null;
-  email: string;
-  phone: string | null;
-  address: string | null;
-  status: CustomerStatusType;
-  cancellationReason: string | null;
-  joinDate: string | null;
-  totalLessons: number | null;
-  lastLesson: string | null;
-}
+import { Database } from "@/lib/supabase/types";
 
 export interface CustomerFormData {
   name: string;
@@ -26,7 +8,7 @@ export interface CustomerFormData {
 
 export interface CustomerFilters {
   searchQuery: string;
-  statusFilter: 'all' | CustomerStatusType;
-  sortField: keyof Customer;
+  statusFilter: 'all' | Database['public']['Enums']['customer_status'];
+  sortField: keyof Database['public']['Functions']['get_customers_for_owner']['Returns'][number];
   sortOrder: 'asc' | 'desc';
 } 

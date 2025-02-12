@@ -1,65 +1,9 @@
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/types';
-import type { Reservation } from '../types/reservation';
-import { ReservationStatus, ReservationStatusType } from '../constants/reservation';
-import { Lesson } from '../types/lesson';
-import { User } from '@supabase/supabase-js';
-import { LessonLocationType, LessonStatusType } from '../constants/lesson';
-import { Customer } from '../types/customer';
-import { CustomerStatusType } from '../constants/customer';
 
 type DbReservation = Database['public']['Tables']['fitness_reservation_reservations']['Row'];
 type DbLesson = Database['public']['Tables']['fitness_reservation_lessons']['Row'];
 type DbUser = Database['public']['Tables']['fitness_reservation_users']['Row'];
-
-// DBのデータを型に変換する関数
-function convertToReservation(
-  dbReservation: DbReservation & { lesson: DbLesson, user: DbUser },
-//   dbLesson: DbLesson,
-//   dbUser: DbUser
-): Reservation & {
-//   lesson: Lesson;
-//   customer: Customer;
-} {
-  return {
-    id: dbReservation.id,
-    lessonId: dbReservation.lesson_id,
-    userId: dbReservation.user_id,
-    status: dbReservation.status as ReservationStatusType,
-    attended: dbReservation.attended,
-    reservedAt: dbReservation.reserved_at,
-    cancelledAt: dbReservation.cancelled_at,
-    createdAt: dbReservation.created_at,
-    updatedAt: dbReservation.updated_at,
-    lesson: {
-      id: dbReservation.lesson.id,
-      lessonTypeId: dbReservation.lesson.lesson_type_id,
-      location: dbReservation.lesson.location as LessonLocationType,
-      maxParticipants: dbReservation.lesson.max_participants,
-      memo: dbReservation.lesson.memo,
-      scheduledStartAt: dbReservation.lesson.scheduled_start_at,
-      scheduledEndAt: dbReservation.lesson.scheduled_end_at,
-      trainerId: dbReservation.lesson.user_id,
-      status: dbReservation.lesson.status as LessonStatusType,
-      createdAt: dbReservation.lesson.created_at,
-      updatedAt: dbReservation.lesson.updated_at,
-    },
-    customer: {
-      id: dbUser.id,
-      roleId: dbUser.role_id,
-      name: dbUser.name,
-      password: null,
-      email: dbUser.email,
-      phone: dbUser.phone,
-      address: dbUser.address,
-      status: dbUser.status as CustomerStatusType,
-      cancellationReason: dbUser.cancellation_reason,
-      joinDate: dbUser.join_date,
-      totalLessons: null,
-      lastLesson: null,
-    },
-  }
-}
 
 // 予約一覧を取得
 export async function getReservations() {

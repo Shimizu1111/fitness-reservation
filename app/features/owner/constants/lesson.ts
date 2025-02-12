@@ -5,20 +5,6 @@ export const LessonStatus = {
   IN_PROGRESS: '進行中',
   COMPLETED: '完了',
   CANCELLED: 'キャンセル',
-} as const;
+} as const satisfies Record<string, Database['public']['Enums']['lesson_status']>;
 
-export type DatabaseLessonStatusType = typeof LessonStatus[keyof typeof LessonStatus];
-
-export const LessonLocation = {
-  STUDIO_A: 1,
-  STUDIO_B: 2,
-  ONLINE: 3,
-} as const;
-
-export const LessonLocationString = {
-  [LessonLocation.STUDIO_A]: 'スタジオA',
-  [LessonLocation.STUDIO_B]: 'スタジオB',
-  [LessonLocation.ONLINE]: 'オンライン',
-} as const;
-
-export type LessonLocationType = typeof LessonLocation[keyof typeof LessonLocation];
+export type LessonStatusType = typeof LessonStatus[keyof typeof LessonStatus];

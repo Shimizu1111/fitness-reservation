@@ -36,6 +36,7 @@ BEGIN
     FROM fitness_reservation_users u
     LEFT JOIN fitness_reservation_reservations r
     ON u.id = r.user_id
+    WHERE u.role = '顧客'
     GROUP BY u.id, u.name, u.email, u.phone, u.address, u.owner_status, u.trainer_status, u.customer_status, u.cancellation_reason, u.join_date;
 END;
 $$;
@@ -55,8 +56,7 @@ RETURNS TABLE (
     max_participants SMALLINT,
     user_id UUID,
     user_name TEXT,
-    participants_count BIGINT,
-    latest_reserved_at TIMESTAMP WITH TIME ZONE
+    participants_count BIGINT
 )
 LANGUAGE plpgsql
 AS $$
@@ -73,8 +73,7 @@ BEGIN
         l.max_participants,
         u.id AS user_id, 
         u.name AS user_name, 
-        COUNT(r.user_id) AS participants_count,
-        MAX(r.reserved_at) AS latest_reserved_at
+        COUNT(r.user_id) AS participants_count
     FROM fitness_reservation_lessons l
     LEFT JOIN fitness_reservation_reservations r 
     ON l.id = r.lesson_id

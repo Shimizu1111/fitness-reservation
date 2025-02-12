@@ -30,7 +30,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# Ignore all .env files except example templates
+.env*
+!.env.example
+!.env.*.example
+
 .env*
 
 # vercel
@@ -43,5 +47,11 @@ next-env.d.ts
 # memo
 memo.md
 
+# .vscode
+.vscode
+
 # sql
 sql/
+
+# prettier
+.prettierrc

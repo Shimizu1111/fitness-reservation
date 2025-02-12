@@ -251,7 +251,6 @@ export type Database = {
           user_id: string
           user_name: string
           participants_count: number
-          latest_reserved_at: string
         }[]
       }
     }

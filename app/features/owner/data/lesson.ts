@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase/client';
-import { Lesson } from '../types/lesson';
+import { LessonStatusType } from '../constants/lesson';
 
 export async function getLessons() {
     const { data: fetchedLessons, error: lessonError } = await supabase.rpc('get_lessons_for_owner');
@@ -12,7 +12,7 @@ export async function getLessons() {
     return { data: fetchedLessons, error: lessonError };
 }
   
-  export async function updateLessonStatus(id: number, status: number) {
+  export async function updateLessonStatus(id: number, status: LessonStatusType) {
     const { data, error } = await supabase
       .from('fitness_reservation_lessons')
       .update({ status })

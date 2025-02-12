@@ -910,6 +910,7 @@ BEGIN
     FROM fitness_reservation_users u
     LEFT JOIN fitness_reservation_reservations r
     ON u.id = r.user_id
+    WHERE u.role = '顧客'
     GROUP BY u.id, u.name, u.email, u.phone, u.address, u.owner_status, u.trainer_status, u.customer_status, u.cancellation_reason, u.join_date;
 END;
 $$;
@@ -921,7 +922,7 @@ ALTER FUNCTION public.get_customers_for_owner() OWNER TO postgres;
 -- Name: get_lessons_for_owner(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_lessons_for_owner() RETURNS TABLE(id bigint, name text, scheduled_start_at timestamp with time zone, scheduled_end_at timestamp with time zone, location public.lesson_location, status public.lesson_status, memo text, max_participants smallint, user_id uuid, user_name text, participants_count bigint, latest_reserved_at timestamp with time zone)
+CREATE FUNCTION public.get_lessons_for_owner() RETURNS TABLE(id bigint, name text, scheduled_start_at timestamp with time zone, scheduled_end_at timestamp with time zone, location public.lesson_location, status public.lesson_status, memo text, max_participants smallint, user_id uuid, user_name text, participants_count bigint)
     LANGUAGE plpgsql
     SET search_path TO 'public'
     AS $$
@@ -938,8 +939,7 @@ BEGIN
         l.max_participants,
         u.id AS user_id, 
         u.name AS user_name, 
-        COUNT(r.user_id) AS participants_count,
-        MAX(r.reserved_at) AS latest_reserved_at
+        COUNT(r.user_id) AS participants_count
     FROM fitness_reservation_lessons l
     LEFT JOIN fitness_reservation_reservations r 
     ON l.id = r.lesson_id
