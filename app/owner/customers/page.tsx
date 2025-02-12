@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { OwnerNav } from "../components/owner-nav";
-import { CustomerList } from "@/app/features/owner/components/customer-list";
+import { OwnerNav } from '../components/owner-nav';
+import { CustomerList } from '@/features/owner/components/customer-list';
 
 export default function CustomersPage() {
   return (
@@ -15,4 +15,4 @@ export default function CustomersPage() {
       </main>
     </div>
   );
-} 
+}

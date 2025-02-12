@@ -1,7 +1,7 @@
 'use client';
 
-import { OwnerNav } from "../../components/owner-nav";
-import { CustomerForm } from "@/app/features/owner/components/customer-form";
+import { OwnerNav } from '../../components/owner-nav';
+import { CustomerForm } from '@/features/owner/components/customer-form';
 
 export default function CreateCustomerPage() {
   return (
@@ -13,4 +13,4 @@ export default function CreateCustomerPage() {
       </main>
     </div>
   );
-} 
+}

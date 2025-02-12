@@ -12,11 +12,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { getLessons } from '@/app/features/owner/data/lesson';
+import { getLessons } from '@/features/owner/data/lesson';
 import {
   LessonStatus,
   LessonStatusType,
-} from '@/app/features/owner/constants/lesson';
+} from '@/features/owner/constants/lesson';
 import { Database } from '@/lib/supabase/types';
 import { useRouter } from 'next/navigation';
 export default function LessonsPage() {
