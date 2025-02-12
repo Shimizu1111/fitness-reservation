@@ -55,7 +55,8 @@ RETURNS TABLE (
     max_participants SMALLINT,
     user_id UUID,
     user_name TEXT,
-    participants_count BIGINT
+    participants_count BIGINT,
+    latest_reserved_at TIMESTAMP WITH TIME ZONE
 )
 LANGUAGE plpgsql
 AS $$

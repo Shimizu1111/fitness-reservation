@@ -921,7 +921,7 @@ ALTER FUNCTION public.get_customers_for_owner() OWNER TO postgres;
 -- Name: get_lessons_for_owner(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_lessons_for_owner() RETURNS TABLE(id bigint, name text, scheduled_start_at timestamp with time zone, scheduled_end_at timestamp with time zone, location public.lesson_location, status public.lesson_status, memo text, max_participants smallint, user_id uuid, user_name text, participants_count bigint)
+CREATE FUNCTION public.get_lessons_for_owner() RETURNS TABLE(id bigint, name text, scheduled_start_at timestamp with time zone, scheduled_end_at timestamp with time zone, location public.lesson_location, status public.lesson_status, memo text, max_participants smallint, user_id uuid, user_name text, participants_count bigint, latest_reserved_at timestamp with time zone)
     LANGUAGE plpgsql
     SET search_path TO 'public'
     AS $$
