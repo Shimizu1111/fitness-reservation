@@ -33,9 +33,7 @@ yarn-error.log*
 # Ignore all .env files except example templates
 .env*
 !.env.example
-!.env.*.example
-
-.env*
+!.env.lc.example
 
 # vercel
 .vercel
