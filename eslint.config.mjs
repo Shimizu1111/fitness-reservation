@@ -43,6 +43,14 @@ export default [
       // キャメルケースを強制
       camelcase: ['error', { properties: 'always' }],
 
+      // Turbopack 由来の未使用変数の警告を無視
+      'no-unused-vars': [
+        'error',
+        {
+          varsIgnorePattern: '^(__turbopack_.*|__TURBOPACK__.*|global|__dirname)$',
+        },
+      ],
+
       // TypeScript の命名規則
       '@typescript-eslint/naming-convention': [
         'error',
