@@ -887,7 +887,7 @@ ALTER FUNCTION public.can_access_fitness_user(user_id uuid, target_id uuid, targ
 -- Name: get_customers_for_owner(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.get_customers_for_owner() RETURNS TABLE(id uuid, role public.user_role, name text, email text, phone text, address text, status public.owner_status, cancellation_reason text, join_date timestamp with time zone, reservation_count bigint, latest_reserved_at timestamp with time zone)
+CREATE FUNCTION public.get_customers_for_owner() RETURNS TABLE(id uuid, role public.user_role, name text, email text, phone text, address text, owner_status public.owner_status, trainer_status public.trainer_status, customer_status public.customer_status, cancellation_reason text, join_date timestamp with time zone, reservation_count bigint, latest_reserved_at timestamp with time zone)
     LANGUAGE plpgsql
     SET search_path TO 'public'
     AS $$
@@ -900,7 +900,9 @@ BEGIN
         u.email, 
         u.phone, 
         u.address,
-        u.status,
+        u.owner_status,
+        u.trainer_status,
+        u.customer_status,
         u.cancellation_reason,
         u.join_date,
         COUNT(r.id) AS reservation_count,
@@ -908,7 +910,7 @@ BEGIN
     FROM fitness_reservation_users u
     LEFT JOIN fitness_reservation_reservations r
     ON u.id = r.user_id
-    GROUP BY u.id, u.name, u.email, u.phone, u.status;
+    GROUP BY u.id, u.name, u.email, u.phone, u.address, u.owner_status, u.trainer_status, u.customer_status, u.cancellation_reason, u.join_date;
 END;
 $$;
 
@@ -936,7 +938,8 @@ BEGIN
         l.max_participants,
         u.id AS user_id, 
         u.name AS user_name, 
-        COUNT(r.user_id) AS participants_count
+        COUNT(r.user_id) AS participants_count,
+        MAX(r.reserved_at) AS latest_reserved_at
     FROM fitness_reservation_lessons l
     LEFT JOIN fitness_reservation_reservations r 
     ON l.id = r.lesson_id

@@ -228,7 +228,9 @@ export type Database = {
           email: string
           phone: string
           address: string
-          status: Database["public"]["Enums"]["owner_status"]
+          owner_status: Database["public"]["Enums"]["owner_status"]
+          trainer_status: Database["public"]["Enums"]["trainer_status"]
+          customer_status: Database["public"]["Enums"]["customer_status"]
           cancellation_reason: string
           join_date: string
           reservation_count: number
