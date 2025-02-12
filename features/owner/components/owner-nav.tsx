@@ -30,17 +30,6 @@ export function OwnerNav() {
           <Button
             variant="ghost"
             className={`text-gray-600 hover:text-sky-600 hover:bg-gray-50 ${
-              pathname === '/owner/reservations'
-                ? 'text-sky-600 bg-gray-50'
-                : ''
-            }`}
-            asChild
-          >
-            <Link href="/owner/reservations">予約管理</Link>
-          </Button>
-          <Button
-            variant="ghost"
-            className={`text-gray-600 hover:text-sky-600 hover:bg-gray-50 ${
               pathname === '/owner/lessons' ? 'text-sky-600 bg-gray-50' : ''
             }`}
             asChild
