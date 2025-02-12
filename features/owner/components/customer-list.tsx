@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { getCustomers, updateCustomerStatus } from '../data/customer';
 import type { CustomerFilters } from '../types/customer';
 import { statusActions } from '../constants/customer';
-import { Database } from '@/lib/supabase/types';
+import { Database } from '@/lib/supabase/supabaseTypes';
 
 type Customers =
   Database['public']['Functions']['get_customers_for_owner']['Returns'];

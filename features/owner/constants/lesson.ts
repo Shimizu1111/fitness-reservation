@@ -1,4 +1,4 @@
-import { Database } from '@/lib/supabase/types';
+import { Database } from '@/lib/supabase/supabaseTypes';
 
 export const LessonStatus = {
   SCHEDULED: '予定',

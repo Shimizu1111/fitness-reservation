@@ -1,6 +1,6 @@
 'use client';
 
-import { OwnerNav } from '../../components/owner-nav';
+import { OwnerNav } from '../../../../features/owner/components/owner-nav';
 import { CustomerForm } from '@/features/owner/components/customer-form';
 
 export default function CreateCustomerPage() {

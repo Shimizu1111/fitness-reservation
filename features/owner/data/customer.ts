@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase/client';
-import type { Database } from '@/lib/supabase/types';
+import type { Database } from '@/lib/supabase/supabaseTypes';
 export type UserReservationSummary = Database['public']['Functions']['get_customers_for_owner']['Returns'][number];
 
 // 会員一覧を取得

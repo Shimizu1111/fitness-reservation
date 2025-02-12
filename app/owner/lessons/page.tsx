@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { OwnerNav } from '../components/owner-nav';
+import { OwnerNav } from '../../../features/owner/components/owner-nav';
 import { Button } from '@/components/ui/button';
 import { Users, Search } from 'lucide-react';
 import {
@@ -17,7 +17,7 @@ import {
   LessonStatus,
   LessonStatusType,
 } from '@/features/owner/constants/lesson';
-import { Database } from '@/lib/supabase/types';
+import { Database } from '@/lib/supabase/supabaseTypes';
 import { useRouter } from 'next/navigation';
 export default function LessonsPage() {
   const router = useRouter();

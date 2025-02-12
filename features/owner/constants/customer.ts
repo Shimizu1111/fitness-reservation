@@ -1,4 +1,4 @@
-import { Database } from "@/lib/supabase/types";
+import { Database } from "@/lib/supabase/supabaseTypes";
 
 type CustomerStatusType = Database['public']['Enums']['customer_status'];
 

@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Home, Calendar } from "lucide-react";
-import { cn } from "@/lib/utils";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Home, Calendar } from 'lucide-react';
+import { cn } from '@/lib/utils/tailwind';
 
 export function TrainerNav() {
   const pathname = usePathname();
 
   const navigation = [
-    { name: "ダッシュボード", href: "/trainer", icon: Home },
-    { name: "レッスン管理", href: "/trainer/lessons", icon: Calendar },
+    { name: 'ダッシュボード', href: '/trainer', icon: Home },
+    { name: 'レッスン管理', href: '/trainer/lessons', icon: Calendar },
   ];
 
   return (
@@ -30,10 +30,10 @@ export function TrainerNav() {
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-2 text-sm font-medium transition-colors",
+                    'flex items-center gap-2 text-sm font-medium transition-colors',
                     pathname === item.href
-                      ? "text-sky-600"
-                      : "text-gray-600 hover:text-gray-900"
+                      ? 'text-sky-600'
+                      : 'text-gray-600 hover:text-gray-900'
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -46,4 +46,4 @@ export function TrainerNav() {
       </div>
     </header>
   );
-} 
+}

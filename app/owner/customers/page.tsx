@@ -1,6 +1,6 @@
 'use client';
 
-import { OwnerNav } from '../components/owner-nav';
+import { OwnerNav } from '../../../features/owner/components/owner-nav';
 import { CustomerList } from '@/features/owner/components/customer-list';
 
 export default function CustomersPage() {

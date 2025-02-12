@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase/client';
-import type { Database } from '@/lib/supabase/types';
+import type { Database } from '@/lib/supabase/supabaseTypes';
 
 type DbReservation = Database['public']['Tables']['fitness_reservation_reservations']['Row'];
 type DbLesson = Database['public']['Tables']['fitness_reservation_lessons']['Row'];

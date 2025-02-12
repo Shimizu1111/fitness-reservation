@@ -55,7 +55,8 @@ export function CustomerForm() {
       console.error('Error:', error);
       toast({
         title: 'エラーが発生しました',
-        description: error instanceof Error ? error.message : '会員登録に失敗しました',
+        description:
+          error instanceof Error ? error.message : '会員登録に失敗しました',
         variant: 'destructive',
       });
     } finally {
@@ -75,7 +76,7 @@ export function CustomerForm() {
           onChange={handleChange}
         />
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="email">メールアドレス</Label>
         <Input
@@ -108,14 +109,10 @@ export function CustomerForm() {
         >
           {isLoading ? '登録中...' : '登録する'}
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.back()}
-        >
+        <Button type="button" variant="outline" onClick={() => router.back()}>
           キャンセル
         </Button>
       </div>
     </form>
   );
-} 
+}
