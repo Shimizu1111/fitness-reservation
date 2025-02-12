@@ -1,50 +1,59 @@
-// import { dirname } from 'path';
-// import { fileURLToPath } from 'url';
-// import { FlatCompat } from '@eslint/eslintrc';
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
-
-// const compat = new FlatCompat({
-//   baseDirectory: __dirname,
-// });
-
-// const eslintConfig = [
-//   ...compat.extends('next/core-web-vitals', 'next/typescript'),
-// ];
-
-// export default eslintConfig;
 
 import js from '@eslint/js';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
+import reactPlugin from 'eslint-plugin-react';
+import prettierPlugin from 'eslint-plugin-prettier';
 
 export default [
+  {
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      '.next/**',
+    ],
+  },
+  // JavaScript の推奨設定
   js.configs.recommended,
   {
-    files: ['**/*.ts', '**/*.tsx'],
+    // 対象ファイルの指定
+    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     languageOptions: {
       parser: tsParser,
+      ecmaVersion: 'latest',
+      sourceType: 'module',
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
+      react: reactPlugin,
+      prettier: prettierPlugin,
+    },
+    settings: {
+      react: {
+        // React のバージョンを自動検出
+        version: 'detect',
+        // 固定バージョンを指定
+        // version: '19.0.0',
+      },
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': 'warn',
+      // Prettier のルールを適用
+      'prettier/prettier': 'error',
+
+      // キャメルケースを強制
       camelcase: ['error', { properties: 'always' }],
-      // Turbopack 変数を無視する設定
-      'no-unused-vars': [
+
+      // TypeScript の命名規則
+      '@typescript-eslint/naming-convention': [
         'error',
-        {
-          varsIgnorePattern: '^(__turbopack_|global|__dirname)$',
-        },
+        { selector: 'variableLike', format: ['camelCase'] },
+        { selector: 'typeLike', format: ['PascalCase'] },
+        { selector: 'enumMember', format: ['UPPER_CASE'] },
       ],
-    },
-  },
-  {
-    files: ['**/*.jsx', '**/*.tsx'],
-    rules: {
-      'react/react-in-jsx-scope': 'off', // React 17+ では必要なし
+
+      // React のルール
+      'react/react-in-jsx-scope': 'off', // React 17+ では不要
+      'react/no-array-index-key': 'off', // Turbopack 由来の警告を無視
     },
   },
 ];
