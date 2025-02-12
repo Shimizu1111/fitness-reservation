@@ -57,6 +57,7 @@ export default [
         { selector: 'variableLike', format: ['camelCase'] },
         { selector: 'typeLike', format: ['PascalCase'] },
         { selector: 'enumMember', format: ['UPPER_CASE'] },
+        { selector: 'function', modifiers: ['exported'], format: ['PascalCase'] },
       ],
 
       // React のルール
